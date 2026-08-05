@@ -83,7 +83,8 @@ canvas{display:block;touch-action:none;}
 
 #mission-card{
   pointer-events:auto;position:absolute;top:0;left:0;right:0;
-  padding:10px 12px calc(10px + env(safe-area-inset-top));
+  padding-top:calc(10px + env(safe-area-inset-top));
+  padding-right:12px;padding-bottom:10px;padding-left:12px;
   display:flex;align-items:center;gap:10px;
 }
 #mission-toggle-btn{
