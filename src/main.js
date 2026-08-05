@@ -20,6 +20,7 @@ import {
 } from './ui.js';
 import { session, scheduleSave, saveGame, freshState } from './state.js';
 import { loadProfileIndex, getLastProfile, clearLastProfile, migrateLegacySaveIfNeeded } from './profiles.js';
+import { exportBackup, importBackupFromFile } from './backup.js';
 
 /* ---------------------- Init monde ---------------------- */
 function initWorld() {
@@ -111,6 +112,23 @@ document.getElementById('mode-solo-btn').addEventListener('click', () => { setSe
 document.getElementById('mode-duo-btn').addEventListener('click', () => { setSelectedMode('duo'); goToProfilePicker(); });
 document.getElementById('back-to-mode-btn').addEventListener('click', () => { hide('profile-picker'); show('mode-picker'); });
 
+document.getElementById('import-save-btn').addEventListener('click', () => {
+  document.getElementById('import-save-input').click();
+});
+document.getElementById('import-save-input').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  e.target.value = '';
+  if (!file) return;
+  if (!confirm('Restaurer cette sauvegarde ? Elle remplacera les profils et parties déjà présents sur cet appareil.')) return;
+  try {
+    await importBackupFromFile(file);
+    alert('Sauvegarde restaurée ! Le jeu va se recharger.');
+    location.reload();
+  } catch (err) {
+    alert("Impossible de lire ce fichier de sauvegarde : " + err.message);
+  }
+});
+
 document.getElementById('new-profile-btn').addEventListener('click', async () => {
   const n1 = (document.getElementById('name-input-1').value||'').trim().slice(0,16) || 'Joueur 1';
   const n2 = (document.getElementById('name-input-2').value||'').trim().slice(0,16) || 'Joueur 2';
@@ -122,6 +140,7 @@ document.getElementById('switch-profile-btn').addEventListener('click', async ()
   await clearLastProfile();
   hide('main-start-actions'); show('mode-picker');
 });
+document.getElementById('export-save-btn').addEventListener('click', () => exportBackup());
 document.getElementById('btn-switch-hud').addEventListener('click', async () => {
   if (confirm("Changer de profil ou de mode ? Ta progression vient d'être sauvegardée.")) {
     await saveGame();
