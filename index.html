@@ -4,6 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8F%9D%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<meta name="theme-color" content="#0E7C86">
+
+<!-- Installation en PWA sur iPhone : Safari ne suit pas le manifest.webmanifest
+     pour l'icône/le mode plein écran, ces balises sont nécessaires en plus. -->
+<link rel="apple-touch-icon" href="%BASE_URL%apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Island 365">
+<meta name="mobile-web-app-capable" content="yes">
+
 <title>Island 365</title>
 </head>
 <body>
@@ -19,6 +29,8 @@
     <div class="sub">Une mission par jour, toute l'année</div>
     <button class="mode-btn primary" id="mode-solo-btn">🧍 Solo<span>1 joueur sur cet appareil</span></button>
     <button class="mode-btn" id="mode-duo-btn">🧍🧍 Duo<span>2 joueurs, en même temps, sur le même appareil</span></button>
+    <button class="ghost-btn" id="import-save-btn">📂 Restaurer une sauvegarde</button>
+    <input type="file" id="import-save-input" accept="application/json" style="display:none;">
   </div>
 
   <div class="flow-panel" id="profile-picker" style="display:none;">
@@ -41,8 +53,10 @@
     <button id="play-btn">Commencer l'exploration</button>
     <button class="ghost-btn" id="customize-btn">🎨 Personnaliser</button>
     <button class="ghost-btn" id="switch-profile-btn">🔄 Changer de profil / mode</button>
+    <button class="ghost-btn" id="export-save-btn">💾 Sauvegarder mes données</button>
     <div id="start-note">Déplace-toi avec le joystick, ramasse ce que tu trouves,
-      et livre chaque jour ce que demande la boutique du jour. Ta progression reste sauvegardée sur cet appareil.</div>
+      et livre chaque jour ce que demande la boutique du jour. Ta progression reste sauvegardée sur cet appareil.
+      Pense à faire régulièrement une sauvegarde (💾) pour ne rien perdre si tu changes de téléphone.</div>
     <div id="loading-line"></div>
   </div>
 
