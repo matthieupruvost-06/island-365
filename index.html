@@ -65,14 +65,13 @@
 <!-- ================= HUD ================= -->
 <div id="hud">
   <div id="mission-card" class="safe-top">
-    <div id="mission-inner">
+    <button id="mission-toggle-btn" type="button">
       <div id="day-badge"><span>JOUR</span><b id="day-num">1</b></div>
       <div id="mission-text">
-        <div class="m-title" id="m-shop">Boutique n°001</div>
-        <div class="m-desc" id="m-desc">Chargement…</div>
-        <div class="m-progress" id="m-progress"></div>
+        <div class="m-desc">🎯 Mission du jour</div>
+        <div class="m-progress" id="m-hint">Chargement…</div>
       </div>
-    </div>
+    </button>
     <div id="coin-pill">🪙 <span id="coin-count">0</span></div>
   </div>
 
@@ -124,6 +123,21 @@
     </div>
     <div id="shop-body" style="font-size:14px;line-height:1.5;"></div>
     <button class="sheet-btn" id="shop-deliver-btn">Livrer la commande</button>
+  </div>
+</div>
+
+<!-- ================= MISSION PANEL ================= -->
+<div class="panel-backdrop" id="panel-mission">
+  <div class="sheet">
+    <button class="sheet-close" data-close="panel-mission">✕</button>
+    <h2>🎯 Mission du jour</h2>
+    <div class="sheet-sub">Jour <span id="panel-day-num">1</span></div>
+    <div class="shop-header">
+      <div class="shop-num" id="panel-mission-badge">n°001</div>
+      <div style="font-weight:800;font-size:15px;" id="panel-mission-title">Boutique n°001</div>
+    </div>
+    <div id="panel-mission-desc" style="font-size:14px;line-height:1.5;margin-top:6px;">Chargement…</div>
+    <div id="panel-mission-progress" style="margin-top:12px;font-weight:800;color:var(--coral);font-size:15px;"></div>
   </div>
 </div>
 

@@ -24,15 +24,42 @@ export function showToast(msg) {
 }
 
 /* ---------------------- HUD ---------------------- */
+// Résumé compact affiché en permanence sur le bouton de la mission. Le
+// détail complet (numéro de boutique en grand, description...) est dans
+// le panneau mission, voir refreshMissionPanel()/openMissionPanel().
 export function refreshHUD() {
   const mission = currentMission();
   document.getElementById('day-num').textContent = (currentDayIndex()%365)+1;
   document.getElementById('coin-count').textContent = session.state.coins;
-  document.getElementById('m-shop').textContent = mission.type==='collect'
+  const hint = document.getElementById('m-hint');
+  if (isMissionDoneToday()) {
+    hint.textContent = '✅ Terminée — appuie pour voir';
+  } else if (mission.type === 'collect') {
+    const have = session.state.inventory[mission.item]||0;
+    hint.textContent = COLLECTIBLE_TYPES[mission.item].emoji+' '+Math.min(have,mission.count)+'/'+mission.count+' — appuie pour voir';
+  } else {
+    hint.textContent = '👉 Appuie pour voir la mission';
+  }
+}
+
+/* ---------------------- Panneau mission ---------------------- */
+export function refreshMissionPanel() {
+  const mission = currentMission();
+  document.getElementById('panel-day-num').textContent = (currentDayIndex()%365)+1;
+
+  const badge = document.getElementById('panel-mission-badge');
+  if (mission.type === 'collect') {
+    badge.textContent = 'n°'+String(currentShopNumber()).padStart(3,'0');
+    badge.style.display = '';
+  } else {
+    badge.style.display = 'none';
+  }
+  document.getElementById('panel-mission-title').textContent = mission.type==='collect'
     ? 'Boutique n°'+String(currentShopNumber()).padStart(3,'0')
-    : (mission.label || 'Défi du jour');
-  document.getElementById('m-desc').textContent = mission.type==='collect' ? 'La boutique '+mission.text : mission.text;
-  const prog = document.getElementById('m-progress');
+    : (mission.emoji ? mission.emoji+' ' : '')+(mission.label || 'Défi du jour');
+  document.getElementById('panel-mission-desc').textContent = mission.type==='collect' ? 'La boutique '+mission.text : mission.text;
+
+  const prog = document.getElementById('panel-mission-progress');
   if (isMissionDoneToday()) {
     prog.textContent = '✅ Mission du jour terminée — reviens demain !';
   } else if (mission.type === 'collect') {
@@ -41,6 +68,10 @@ export function refreshHUD() {
   } else {
     prog.textContent = '🎯 '+(mission.label||'');
   }
+}
+export function openMissionPanel() {
+  refreshMissionPanel();
+  openPanel('panel-mission');
 }
 
 /* ---------------------- Minimap ---------------------- */

@@ -16,7 +16,8 @@ import { initCharacterCreator, openCharacterPanel } from './character.js';
 import {
   refreshHUD, setupMinimap, drawMinimap, showToast, openPanel, closePanel,
   show, hide, goToProfilePicker, createAndSelectProfile, selectProfile,
-  refreshInventoryPanel, openShopPanel, openBoatPanel, setSelectedMode
+  refreshInventoryPanel, openShopPanel, openBoatPanel, setSelectedMode,
+  openMissionPanel
 } from './ui.js';
 import { session, scheduleSave, saveGame, freshState } from './state.js';
 import { loadProfileIndex, getLastProfile, clearLastProfile, migrateLegacySaveIfNeeded } from './profiles.js';
@@ -149,6 +150,7 @@ document.getElementById('btn-switch-hud').addEventListener('click', async () => 
   }
 });
 document.getElementById('btn-inventory').addEventListener('click', () => { refreshInventoryPanel(); openPanel('panel-inventory'); });
+document.getElementById('mission-toggle-btn').addEventListener('click', openMissionPanel);
 document.getElementById('btn-day').addEventListener('click', () => {
   session.state.dayOffset += 1;
   showToast('☀️ Un nouveau jour se lève sur Island 365');
