@@ -8,6 +8,8 @@ export const world = {
   renderer: null,
   clock: null,
   sunLight: null,
+  ambientLight: null,
+  hemiLight: null,
   waterMesh: null,
   waterGeo: null,
   boatMesh: null,

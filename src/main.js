@@ -23,6 +23,7 @@ import { session, scheduleSave, saveGame, freshState } from './state.js';
 import { loadProfileIndex, getLastProfile, clearLastProfile, migrateLegacySaveIfNeeded } from './profiles.js';
 import { exportBackup, importBackupFromFile } from './backup.js';
 import { tickPositionSync, ensureRemoteEntity, joinOnlineGame, isHost } from './sync.js';
+import { advanceDayPhase } from './world/daynight.js';
 
 /* ---------------------- Init monde ---------------------- */
 function initWorld() {
@@ -42,7 +43,8 @@ function initWorld() {
   world.renderer.toneMappingExposure = 1.08;
   document.getElementById('canvas-holder').appendChild(world.renderer.domElement);
 
-  world.scene.add(new THREE.HemisphereLight(0xbdf0ff, 0x3a6b45, 0.9));
+  world.hemiLight = new THREE.HemisphereLight(0xbdf0ff, 0x3a6b45, 0.9);
+  world.scene.add(world.hemiLight);
   world.sunLight = new THREE.DirectionalLight(0xfff3da, 1.05);
   world.sunLight.position.set(70,110,40);
   world.sunLight.castShadow = true;
@@ -52,7 +54,8 @@ function initWorld() {
   world.sunLight.shadow.camera.near=1; world.sunLight.shadow.camera.far=320;
   world.sunLight.shadow.bias=-0.0018;
   world.scene.add(world.sunLight); world.scene.add(world.sunLight.target);
-  world.scene.add(new THREE.AmbientLight(0xffffff,0.22));
+  world.ambientLight = new THREE.AmbientLight(0xffffff,0.22);
+  world.scene.add(world.ambientLight);
 
   buildSky(world.scene); buildMainTerrain(world.scene);
   const ocean = buildOcean(world.scene);
@@ -194,6 +197,11 @@ document.getElementById('btn-switch-hud').addEventListener('click', async () => 
   }
 });
 document.getElementById('btn-inventory').addEventListener('click', () => { refreshInventoryPanel(); openPanel('panel-inventory'); });
+document.getElementById('btn-time').addEventListener('click', () => {
+  const phase = advanceDayPhase();
+  document.getElementById('btn-time').textContent = phase.emoji;
+  showToast(phase.emoji + ' ' + phase.label);
+});
 document.getElementById('mission-toggle-btn').addEventListener('click', openMissionPanel);
 document.getElementById('btn-day').addEventListener('click', () => {
   session.state.dayOffset += 1;
