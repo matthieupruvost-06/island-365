@@ -5,6 +5,7 @@ import { buildSky } from './world/sky.js';
 import { buildMainTerrain } from './world/terrain.js';
 import { buildOcean, animateWater } from './world/ocean.js';
 import { scatter, makePalm, makePine, makeJungleTree, makeRock, makeFlower } from './world/decor.js';
+import { makeRabbit, makeBird, makeDeer } from './world/animals.js';
 import { buildIslets } from './world/islets.js';
 import { buildWaterfall, buildMineEntrance, buildDock } from './world/landmarks.js';
 import { buildVillage } from './world/village.js';
@@ -71,6 +72,14 @@ function initWorld() {
   scatter(world.scene, 28, makeRock, [-96,-24], [-90,-24]);
   scatter(world.scene, 85, makeJungleTree, [-20,90], [-90,-24]);
   scatter(world.scene, 22, makeRock, [-20,90], [-90,-24]);
+
+  // Un peu de vie dans les bois : petits animaux décoratifs, dispersés
+  // dans la forêt de pins (avec la mine) et dans la jungle.
+  scatter(world.scene, 7, makeRabbit, [-96,-24], [-90,-24]);
+  scatter(world.scene, 6, makeBird, [-96,-24], [-90,-24]);
+  scatter(world.scene, 3, makeDeer, [-96,-30], [-85,-30]);
+  scatter(world.scene, 9, makeRabbit, [-20,90], [-90,-24]);
+  scatter(world.scene, 8, makeBird, [-20,90], [-90,-24]);
 
   world.players = [];
   if (session.state.mode === 'duo') {
