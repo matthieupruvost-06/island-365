@@ -1,8 +1,9 @@
 # Island 365 🏝️
 
-Une île procédurale en Three.js, jouable en solo ou en duo (2 joueurs sur le
-même appareil), avec une mission différente chaque jour, un créateur de
-personnage low-poly, et une sauvegarde locale par profil.
+Une île procédurale en Three.js, jouable en solo, en duo (2 joueurs sur le
+même appareil) ou en ligne (2 joueurs, chacun sur son propre appareil), avec
+une mission différente chaque jour, un créateur de personnage low-poly, et
+une sauvegarde locale par profil.
 
 Ce dépôt est la reconstruction, en projet Vite multi-fichiers, du prototype
 fonctionnel `island365-prototype.html` (fichier HTML unique). Toute la
@@ -81,11 +82,33 @@ asynchrone (`get`, `set`, `delete`, `list`) mais persiste réellement dans
 - `island365-save` — clé legacy (avant l'introduction des profils), migrée
   automatiquement vers un premier profil solo si elle existe
 
-**`localStorage` est local à l'appareil.** "Jouer en ligne" signifie ici que
-le jeu est accessible via une URL, pas que deux joueurs sur deux appareils
-partagent une partie en réseau. Le mode Duo reste volontairement local : deux
-personnages, deux joysticks, sur le même écran — voir "Pistes futures"
-ci-dessous pour un vrai multijoueur réseau.
+**`localStorage` est local à l'appareil.** Le mode Duo reste local à un seul
+appareil : deux personnages, deux joysticks, sur le même écran. Pour jouer
+avec un ami sur deux appareils différents, voir le mode **En ligne**
+ci-dessous, qui ne passe pas par `localStorage` pour la partie partagée.
+
+## Jouer en ligne (deux appareils)
+
+Le mode **🌐 En ligne** connecte deux téléphones directement entre eux par
+WebRTC (bibliothèque [Trystero](https://github.com/dmotz/trystero)), sans
+serveur à héberger ni compte à créer : les deux appareils se retrouvent via
+des relais publics gratuits (réseau Nostr) juste pour se présenter l'un à
+l'autre, puis toutes les données du jeu passent directement de téléphone à
+téléphone.
+
+- **Héberger une partie** : choisis ou crée un profil (comme en solo), un
+  code à 4 lettres est généré — donne-le à ton ami. Tu peux commencer à
+  jouer tout de suite sans attendre qu'il se connecte.
+- **Rejoindre une partie** : entre ton prénom et le code reçu.
+- Une fois connectés, les deux personnages, l'inventaire, les pièces et la
+  mission du jour sont **partagés** (comme en Duo, mais à distance). La
+  personne qui a hébergé la partie est la seule dont la sauvegarde persiste
+  sur son appareil (`src/sync.js` — modèle hôte/invité volontairement
+  simple : l'hôte est la seule source de vérité, ce qui évite tout
+  désaccord entre les deux appareils sur "qui a eu quoi en premier").
+- Ça fonctionne bien sur wifi domestique ou 4G/5G. Sur un réseau très
+  filtré (wifi d'école ou d'entreprise qui bloque le trafic pair-à-pair),
+  la connexion peut échouer — c'est une limite du réseau local, pas du jeu.
 
 ### Ne pas perdre sa progression
 
@@ -127,6 +150,8 @@ src/
   players.js             entités joueur, joystick/clavier, mouvement, caméra
   missions.js             mission du jour, interactions boutique/bateau/reach
   ui.js                   HUD, panneaux, minimap, toasts, écran d'accueil
+  network.js              connexion WebRTC (Trystero) : créer/rejoindre une salle
+  sync.js                 synchronisation de la partie partagée en mode En ligne
   world/
     runtime.js            état runtime partagé (scène, joueurs actifs...)
     terrain.js            terrainInfo(), forme de l'île, terrain principal
@@ -155,8 +180,9 @@ gardé son nom pour rester facile à comparer.
   = création du profil), avec un bouton debug "jour suivant" dans le HUD.
 - Créateur de personnage low-poly 100% généré par code (aucun modèle 3D
   chargé) : peau, coiffure, couleur de cheveux, yeux, haut/bas, chapeau.
-- Profils multiples indépendants, solo ou duo (coopératif, un seul appareil,
-  caméra partagée), avec reprise automatique du dernier profil utilisé.
+- Profils multiples indépendants, solo, duo (coopératif, un seul appareil,
+  caméra partagée) ou en ligne (coopératif, deux appareils via WebRTC), avec
+  reprise automatique du dernier profil utilisé.
 - Joystick tactile + clavier (ZQSD/flèches), déplacement toujours relatif à
   l'orientation de la caméra.
 - Sauvegarde automatique (debounce ~800 ms) à chaque changement d'état, plus
@@ -166,10 +192,6 @@ gardé son nom pour rester facile à comparer.
 
 ## Pistes futures (hors-scope de cette passe)
 
-- **Vrai multijoueur réseau** (deux appareils, une partie partagée en
-  direct) : nécessiterait un serveur (WebSocket / Colyseus / Supabase
-  Realtime) pour synchroniser positions et inventaire, et une base de
-  données partagée à la place de `localStorage`. Chantier séparé.
 - Passage de 48 à 365 boutiques réellement modélisées.
 - Rédaction de 365 missions uniques plutôt qu'un cycle de 12.
 
