@@ -13,7 +13,9 @@ export function freshState(mode) {
     startDayIndex: realDayIndex(), // le jour 1 commence à la création du profil
     completedDays: {}
   };
-  if (mode === 'duo') {
+  if (mode === 'duo' || mode === 'online') {
+    // 'online' utilise la même forme que 'duo' (deux personnages) : l'un
+    // est contrôlé sur cet appareil, l'autre arrive par le réseau.
     base.players = [
       {appearance: Object.assign({}, DEFAULT_APPEARANCE_P1), pos: {x:-3, y:0, z:82}},
       {appearance: Object.assign({}, DEFAULT_APPEARANCE_P2), pos: {x:3, y:0, z:82}}
@@ -47,7 +49,7 @@ export async function loadGame() {
     if (r && r.value) {
       const loaded = JSON.parse(r.value);
       session.state = Object.assign(freshState(mode), loaded);
-      if (mode === 'duo') {
+      if (mode === 'duo' || mode === 'online') {
         const defaults = [DEFAULT_APPEARANCE_P1, DEFAULT_APPEARANCE_P2];
         const loadedPlayers = loaded.players || [];
         session.state.players = [0, 1].map(i => ({

@@ -4,8 +4,9 @@ import { terrainInfo } from './terrain.js';
 import { COLLECTIBLE_TYPES, MINE_POS, CAVE_POS } from '../config.js';
 import { ISLETS } from './islets.js';
 import { world } from './runtime.js';
-import { session, scheduleSave } from '../state.js';
-import { showToast, refreshHUD } from '../ui.js';
+import { showToast } from '../ui.js';
+import { dispatchAction, isOnline } from '../sync.js';
+import * as network from '../network.js';
 
 export function spawnCollectible(scene, type, x, z, yOff) {
   yOff = yOff || 1;
@@ -35,19 +36,23 @@ export function scatterCollectibles(scene) {
 }
 
 export function updateCollectibles(dt, t) {
-  for (const c of world.collectMeshes) {
-    if (c.taken) continue;
+  world.collectMeshes.forEach((c, index) => {
+    if (c.taken) return;
     c.mesh.rotation.y += dt*c.mesh.userData.spin;
     c.mesh.position.y = c.mesh.userData.baseY + Math.sin(t*2+c.mesh.userData.phase)*0.15;
     for (const p of world.players) {
-      if (c.mesh.position.distanceTo(p.mesh.position) < 1.6) { collectItem(c); break; }
+      // Un joueur "distant" (l'ami connecté par le réseau) n'est ramassé
+      // que sur SON appareil ; ici on ne regarde que les joueurs qu'on
+      // contrôle réellement soi-même, pour ne pas compter deux fois.
+      if (p.remote) continue;
+      if (c.mesh.position.distanceTo(p.mesh.position) < 1.6) { collectItem(c, index); break; }
     }
-  }
+  });
 }
 
-function collectItem(c) {
+function collectItem(c, index) {
   c.taken = true; world.scene.remove(c.mesh);
-  session.state.inventory[c.type] = (session.state.inventory[c.type]||0)+1;
   showToast(COLLECTIBLE_TYPES[c.type].emoji+" "+COLLECTIBLE_TYPES[c.type].name+" +1");
-  refreshHUD(); scheduleSave();
+  if (isOnline()) network.sendCollectTaken({ index });
+  dispatchAction({ type:'collect', index, item:c.type });
 }

@@ -12,6 +12,22 @@ export function makePlayerEntity(scene, appearance, savedPos) {
   scene.add(mesh);
   return { appearance, mesh, heading:Math.PI, bob:0, input:{active:false,dx:0,dy:0}, useKeyboard:false, nearest:null };
 }
+
+// Entité "miroir" pour le joueur connecté depuis l'autre appareil (mode en
+// ligne) : pas de joystick, pas de physique locale — sa position vient des
+// messages reçus par le réseau (voir setRemoteTarget), juste affichée avec
+// un léger lissage pour que ça ne saccade pas entre deux messages.
+export function makeRemoteEntity(scene, appearance, pos) {
+  const entity = makePlayerEntity(scene, appearance, pos);
+  entity.remote = true;
+  entity.remoteTarget = entity.mesh.position.clone();
+  entity.remoteHeading = entity.heading;
+  return entity;
+}
+export function setRemoteTarget(entity, x, y, z, heading) {
+  entity.remoteTarget.set(x, y, z);
+  entity.remoteHeading = heading;
+}
 export function rebuildPlayerEntityMesh(scene, entity, appearance) {
   entity.appearance = appearance;
   const pos = entity.mesh.position.clone(), rot = entity.mesh.rotation.y;
@@ -76,10 +92,22 @@ export function computeMoveVector(inputState, useKeyboard, camHeading) {
 export function withinMainBounds(x,z) { return Math.hypot(x,z) < islandRadius(angleOf(x,z)) + 3; }
 export function withinIsletBounds(center,x,z) { return Math.hypot(x-center.x,z-center.z) < 15; }
 
+function updateRemotePlayer(p, dt) {
+  // Pas de joystick à lire : on glisse doucement vers la dernière position
+  // connue reçue par le réseau, ça évite les à-coups entre deux messages.
+  p.mesh.position.lerp(p.remoteTarget, Math.min(1, dt*10));
+  let diff = p.remoteHeading - p.heading;
+  while (diff>Math.PI) diff-=Math.PI*2;
+  while (diff<-Math.PI) diff+=Math.PI*2;
+  p.heading += diff*Math.min(1,dt*10);
+  p.mesh.rotation.y = p.heading;
+}
+
 export function updateAllPlayers(dt) {
   const speed = 12.5;
   let turnAccum = 0, turnWeight = 0;
   world.players.forEach(p => {
+    if (p.remote) { updateRemotePlayer(p, dt); return; }
     const mv = computeMoveVector(p.input, p.useKeyboard, world.camHeading);
     if (mv.mag > 0) {
       const nx = p.mesh.position.x + mv.x*speed*dt*mv.mag;
@@ -106,6 +134,9 @@ export function updateAllPlayers(dt) {
 
   if (session.state.mode === 'duo') {
     world.players.forEach((p,i) => { session.state.players[i].pos = {x:p.mesh.position.x,y:p.mesh.position.y,z:p.mesh.position.z}; });
+  } else if (session.state.mode === 'online') {
+    const me = world.players[0];
+    if (me) session.state.players[world.mySlot].pos = {x:me.mesh.position.x,y:me.mesh.position.y,z:me.mesh.position.z};
   } else if (world.players[0]) {
     session.state.playerPos = {x:world.players[0].mesh.position.x,y:world.players[0].mesh.position.y,z:world.players[0].mesh.position.z};
   }

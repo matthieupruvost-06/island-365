@@ -6,6 +6,7 @@ import { islandRadius } from './world/terrain.js';
 import { ISLETS } from './world/islets.js';
 import { rand } from './rng.js';
 import { loadProfileIndex, createProfile, setLastProfile } from './profiles.js';
+import { dispatchAction, startHosting } from './sync.js';
 
 /* ---------------------- Panneaux (bottom sheets) ---------------------- */
 export function openPanel(id) { document.getElementById(id).classList.add('open'); }
@@ -138,11 +139,9 @@ export function openShopPanel(shopData) {
     deliverBtn.textContent = have>=need ? 'Livrer la commande' : 'Il manque des objets…';
     deliverBtn.onclick = () => {
       if ((session.state.inventory[mission.item]||0) >= mission.count) {
-        session.state.inventory[mission.item] -= mission.count;
-        session.state.completedDays[currentDayIndex()] = true;
-        session.state.coins += mission.reward;
+        dispatchAction({ type:'deliverShop', item: mission.item, count: mission.count, reward: mission.reward, dayIndex: currentDayIndex() });
         showToast('✅ Livraison réussie ! +'+mission.reward+' 🪙');
-        refreshHUD(); scheduleSave(); closePanel('panel-shop');
+        closePanel('panel-shop');
       }
     };
   } else if (isTargetShop && isMissionDoneToday()) {
@@ -192,7 +191,9 @@ export function setSelectedMode(m) { selectedMode = m; }
 
 export async function goToProfilePicker() {
   hide('mode-picker'); show('profile-picker');
-  document.getElementById('picker-sub').textContent = selectedMode==='duo' ? 'Choisissez votre équipe' : "Qui explore aujourd'hui ?";
+  document.getElementById('picker-sub').textContent = selectedMode==='duo' ? 'Choisissez votre équipe'
+    : selectedMode==='online' ? 'Qui héberge la partie ?'
+    : "Qui explore aujourd'hui ?";
   document.getElementById('name-input-2').style.display = selectedMode==='duo' ? 'block' : 'none';
   document.getElementById('name-input-1').placeholder = selectedMode==='duo' ? 'Prénom du joueur 1' : 'Prénom';
   const list = await loadProfileIndex();
@@ -218,6 +219,11 @@ export async function selectProfile(p) {
   session.activeProfile = p;
   await setLastProfile(p.id, p.mode);
   await loadGame();
-  document.getElementById('active-profile-label').textContent = 'Profil : '+p.name;
+  if (p.mode === 'online') {
+    const code = startHosting();
+    document.getElementById('active-profile-label').textContent = `Profil : ${p.name} · Code ami : ${code}`;
+  } else {
+    document.getElementById('active-profile-label').textContent = 'Profil : '+p.name;
+  }
   hide('profile-picker'); hide('mode-picker'); show('main-start-actions');
 }

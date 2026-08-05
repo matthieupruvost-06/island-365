@@ -29,8 +29,29 @@
     <div class="sub">Une mission par jour, toute l'année</div>
     <button class="mode-btn primary" id="mode-solo-btn">🧍 Solo<span>1 joueur sur cet appareil</span></button>
     <button class="mode-btn" id="mode-duo-btn">🧍🧍 Duo<span>2 joueurs, en même temps, sur le même appareil</span></button>
+    <button class="mode-btn" id="mode-online-btn">🌐 En ligne<span>Jouer avec un ami, chacun sur son appareil</span></button>
     <button class="ghost-btn" id="import-save-btn">📂 Restaurer une sauvegarde</button>
     <input type="file" id="import-save-input" accept="application/json" style="display:none;">
+  </div>
+
+  <div class="flow-panel" id="online-choice" style="display:none;">
+    <div class="island-badge">🏝️</div>
+    <h1 style="font-size:28px;">ISLAND 365</h1>
+    <div class="sub">Jouer avec un ami sur un autre appareil</div>
+    <button class="mode-btn primary" id="online-host-btn">🖥️ Héberger une partie<span>Tu crées la partie et tu reçois un code à donner à ton ami</span></button>
+    <button class="mode-btn" id="online-join-btn">🔗 Rejoindre avec un code<span>Ton ami t'a donné un code, tu l'entres ici</span></button>
+    <button class="ghost-btn" id="online-choice-back-btn">← Retour</button>
+  </div>
+
+  <div class="flow-panel" id="online-join" style="display:none;">
+    <div class="island-badge">🏝️</div>
+    <h1 style="font-size:28px;">ISLAND 365</h1>
+    <div class="sub">Rejoindre la partie de ton ami</div>
+    <input id="online-join-name" placeholder="Ton prénom" maxlength="16">
+    <input id="online-join-code" placeholder="Code (ex : BLPX)" maxlength="4" style="text-transform:uppercase;margin-top:8px;">
+    <button class="mode-btn primary" id="online-join-confirm-btn" style="margin-top:8px;">Rejoindre la partie</button>
+    <div class="sub" id="online-join-status" style="margin-top:10px;"></div>
+    <button class="ghost-btn" id="online-join-back-btn">← Retour</button>
   </div>
 
   <div class="flow-panel" id="profile-picker" style="display:none;">

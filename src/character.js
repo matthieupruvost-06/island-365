@@ -6,6 +6,7 @@ import { session, scheduleSave } from './state.js';
 import { world } from './world/runtime.js';
 import { rebuildPlayerEntityMesh } from './players.js';
 import { openPanel, closePanel } from './ui.js';
+import { dispatchAction, isOnline } from './sync.js';
 
 function stdMat(color, opts) {
   opts = opts || {};
@@ -70,7 +71,11 @@ let pvRenderer, pvScene, pvCamera, pvMesh, pvRAF = null, pvSpinning = true;
 let charEditingIndex = 0; // 0 = Joueur 1, 1 = Joueur 2 (duo uniquement)
 
 function activeAppearanceRef() {
-  if (session.activeProfile && session.activeProfile.mode === 'duo') return session.state.players[charEditingIndex].appearance;
+  const mode = session.activeProfile && session.activeProfile.mode;
+  if (mode === 'duo') return session.state.players[charEditingIndex].appearance;
+  // En ligne, chacun ne modifie que son propre personnage — pas de bascule
+  // Joueur 1/Joueur 2, "mon" slot dépend de si je suis l'hôte ou l'invité·e.
+  if (mode === 'online') return session.state.players[world.mySlot].appearance;
   return session.state.appearance;
 }
 function setupPreview() {
@@ -153,8 +158,16 @@ function renderCharacterPanel() {
 }
 function onAppearanceChanged() {
   refreshPreviewMesh();
-  if (world.players[charEditingIndex]) rebuildPlayerEntityMesh(world.scene, world.players[charEditingIndex], activeAppearanceRef());
-  scheduleSave();
+  // En ligne, world.players[0] est toujours MON personnage (peu importe si
+  // je suis l'hôte ou l'invité·e) — c'est la convention utilisée partout
+  // ailleurs pour brancher le joystick local sur la bonne entité.
+  const localIndex = isOnline() ? 0 : charEditingIndex;
+  if (world.players[localIndex]) rebuildPlayerEntityMesh(world.scene, world.players[localIndex], activeAppearanceRef());
+  if (isOnline()) {
+    dispatchAction({ type:'setAppearance', slot: world.mySlot, appearance: activeAppearanceRef() });
+  } else {
+    scheduleSave();
+  }
 }
 
 export function initCharacterCreator() {
