@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8F%9D%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<title>Island 365</title>
+</head>
+<body>
+
+<div id="canvas-holder"></div>
+
+<!-- ================= START SCREEN ================= -->
+<div id="start-screen">
+
+  <div class="flow-panel" id="mode-picker">
+    <div class="island-badge">🏝️</div>
+    <h1>ISLAND 365</h1>
+    <div class="sub">Une mission par jour, toute l'année</div>
+    <button class="mode-btn primary" id="mode-solo-btn">🧍 Solo<span>1 joueur sur cet appareil</span></button>
+    <button class="mode-btn" id="mode-duo-btn">🧍🧍 Duo<span>2 joueurs, en même temps, sur le même appareil</span></button>
+  </div>
+
+  <div class="flow-panel" id="profile-picker" style="display:none;">
+    <div class="island-badge">🏝️</div>
+    <h1 style="font-size:28px;">ISLAND 365</h1>
+    <div class="sub" id="picker-sub">Qui explore aujourd'hui ?</div>
+    <div id="profile-list"></div>
+    <div id="new-profile-form">
+      <input id="name-input-1" placeholder="Prénom du joueur 1" maxlength="16">
+      <input id="name-input-2" placeholder="Prénom du joueur 2" maxlength="16" style="display:none;">
+      <button class="mode-btn primary" id="new-profile-btn" style="margin-top:2px;">+ Nouveau profil</button>
+    </div>
+    <button class="ghost-btn" id="back-to-mode-btn">← Retour</button>
+  </div>
+
+  <div class="flow-panel" id="main-start-actions" style="display:none;">
+    <div class="island-badge">🏝️</div>
+    <h1 style="font-size:28px;">ISLAND 365</h1>
+    <div class="sub" id="active-profile-label">Profil</div>
+    <button id="play-btn">Commencer l'exploration</button>
+    <button class="ghost-btn" id="customize-btn">🎨 Personnaliser</button>
+    <button class="ghost-btn" id="switch-profile-btn">🔄 Changer de profil / mode</button>
+    <div id="start-note">Déplace-toi avec le joystick, ramasse ce que tu trouves,
+      et livre chaque jour ce que demande la boutique du jour. Ta progression reste sauvegardée sur cet appareil.</div>
+    <div id="loading-line"></div>
+  </div>
+
+</div>
+
+<!-- ================= HUD ================= -->
+<div id="hud">
+  <div id="mission-card" class="safe-top">
+    <div id="mission-inner">
+      <div id="day-badge"><span>JOUR</span><b id="day-num">1</b></div>
+      <div id="mission-text">
+        <div class="m-title" id="m-shop">Boutique n°001</div>
+        <div class="m-desc" id="m-desc">Chargement…</div>
+        <div class="m-progress" id="m-progress"></div>
+      </div>
+    </div>
+    <div id="coin-pill">🪙 <span id="coin-count">0</span></div>
+  </div>
+
+  <div id="minimap"></div>
+
+  <div id="top-buttons">
+    <button class="icon-btn" id="btn-character">👤</button>
+    <button class="icon-btn" id="btn-inventory">🎒</button>
+    <button class="icon-btn" id="btn-day">⏭️</button>
+    <button class="icon-btn" id="btn-switch-hud">🔀</button>
+  </div>
+
+  <div id="toast-wrap"></div>
+
+  <!-- P1 -->
+  <div id="joystick-zone"><div id="joy-base"></div><div id="joy-nub"><i></i></div></div>
+  <button id="action-btn" class="safe-bottom"><span class="a-emoji">✋</span><span id="action-label">Interagir</span></button>
+  <div class="p-tag p2-only" id="tag-p1">J1</div>
+
+  <!-- P2 (duo uniquement) -->
+  <div id="joystick-zone-p2" class="p2-only"><div id="joy-base-p2"></div><div id="joy-nub-p2"><i></i></div></div>
+  <button id="action-btn-p2" class="p2-only"><span class="a-emoji">✋</span><span id="action-label-p2">Interagir</span></button>
+  <div class="p-tag p2-only" id="tag-p2">J2</div>
+</div>
+
+<!-- ================= INVENTORY PANEL ================= -->
+<div class="panel-backdrop" id="panel-inventory">
+  <div class="sheet">
+    <button class="sheet-close" data-close="panel-inventory">✕</button>
+    <h2>🎒 Notre collection</h2>
+    <div class="sheet-sub">Tout ce que vous avez trouvé sur l'île depuis le début.</div>
+    <div class="grid-inv" id="inv-grid"></div>
+    <div id="reset-note">Réinitialiser toute la progression de ce profil ?
+      <a href="#" id="reset-link" style="color:var(--coral);font-weight:700;">Recommencer à zéro</a>
+    </div>
+  </div>
+</div>
+
+<!-- ================= SHOP PANEL ================= -->
+<div class="panel-backdrop" id="panel-shop">
+  <div class="sheet">
+    <button class="sheet-close" data-close="panel-shop">✕</button>
+    <div class="shop-header">
+      <div class="shop-num" id="shop-num-label">n°001</div>
+      <div>
+        <div style="font-weight:800;font-size:15px;" id="shop-name">Boutique</div>
+        <div style="font-size:12px;color:#5a7a7a;" id="shop-specialty">Spécialité</div>
+      </div>
+    </div>
+    <div id="shop-body" style="font-size:14px;line-height:1.5;"></div>
+    <button class="sheet-btn" id="shop-deliver-btn">Livrer la commande</button>
+  </div>
+</div>
+
+<!-- ================= BOAT / ISLETS PANEL ================= -->
+<div class="panel-backdrop" id="panel-boat">
+  <div class="sheet">
+    <button class="sheet-close" data-close="panel-boat">✕</button>
+    <h2>🚤 Le quai</h2>
+    <div class="sheet-sub">Choisis un îlot secret à explorer.</div>
+    <div id="islet-list"></div>
+  </div>
+</div>
+
+<!-- ================= CHARACTER CREATOR PANEL ================= -->
+<div class="panel-backdrop" id="panel-character">
+  <div class="sheet">
+    <button class="sheet-close" data-close="panel-character">✕</button>
+    <h2>🎨 Personnage</h2>
+    <div class="sheet-sub">Choisis l'apparence — ça se sauvegarde automatiquement.</div>
+
+    <div class="style-row" id="player-toggle-row">
+      <button class="style-pill" id="edit-p1-btn">🙂 Joueur 1</button>
+      <button class="style-pill" id="edit-p2-btn">🙂 Joueur 2</button>
+    </div>
+
+    <div class="char-preview-wrap">
+      <canvas id="char-preview-canvas" width="220" height="220"></canvas>
+    </div>
+
+    <div class="char-section-label">🎨 Peau</div>
+    <div class="swatch-row" id="row-skin"></div>
+
+    <div class="char-section-label">💇 Coiffure</div>
+    <div class="style-row" id="row-hairstyle"></div>
+
+    <div class="char-section-label">🎨 Couleur de cheveux</div>
+    <div class="swatch-row" id="row-haircolor"></div>
+
+    <div class="char-section-label">👀 Yeux</div>
+    <div class="swatch-row" id="row-eyes"></div>
+
+    <div class="char-section-label">👕 Haut</div>
+    <div class="swatch-row" id="row-shirt"></div>
+
+    <div class="char-section-label">👖 Bas</div>
+    <div class="swatch-row" id="row-pants"></div>
+
+    <div class="char-section-label">🎩 Accessoire</div>
+    <div class="toggle-row">
+      <label>Chapeau tropical</label>
+      <div class="switch" id="hat-toggle"><i></i></div>
+    </div>
+    <div class="swatch-row" id="row-hatcolor" style="margin-top:10px;"></div>
+
+    <button class="sheet-btn" id="char-done-btn">C'est parfait !</button>
+  </div>
+</div>
+
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>
