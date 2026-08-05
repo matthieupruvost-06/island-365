@@ -167,6 +167,7 @@ export function startHosting() {
   world.mySlot = 0;
   wireNetworkHandlers();
   const code = network.generateRoomCode();
+  world.onlineCode = code;
   network.connect(code);
   return code;
 }

@@ -22,6 +22,7 @@ import {
 import { session, scheduleSave, saveGame, freshState } from './state.js';
 import { loadProfileIndex, getLastProfile, clearLastProfile, migrateLegacySaveIfNeeded } from './profiles.js';
 import { exportBackup, importBackupFromFile } from './backup.js';
+import { tickPositionSync, ensureRemoteEntity, joinOnlineGame, isHost } from './sync.js';
 
 /* ---------------------- Init monde ---------------------- */
 function initWorld() {
@@ -73,6 +74,13 @@ function initWorld() {
     world.players.push(makePlayerEntity(world.scene, session.state.players[0].appearance, session.state.players[0].pos));
     world.players.push(makePlayerEntity(world.scene, session.state.players[1].appearance, session.state.players[1].pos));
     world.players[0].useKeyboard = true;
+  } else if (session.state.mode === 'online') {
+    // world.players[0] est toujours MON personnage sur cet appareil (même
+    // si, dans la sauvegarde partagée, je suis "l'invité·e" au slot 1).
+    const mine = session.state.players[world.mySlot];
+    world.players.push(makePlayerEntity(world.scene, mine.appearance, mine.pos));
+    world.players[0].useKeyboard = true;
+    ensureRemoteEntity(); // au cas où l'ami se soit déjà présenté avant qu'on lance le monde
   } else {
     world.players.push(makePlayerEntity(world.scene, session.state.appearance, session.state.playerPos));
     world.players[0].useKeyboard = true;
@@ -97,8 +105,12 @@ function animate() {
   updateAllPlayers(dt);
   updateCamera(dt);
   updateCollectibles(dt,t);
+  tickPositionSync(dt);
   if (world.players[0]) updateNearbyFor(world.players[0], document.getElementById('action-btn'), document.getElementById('action-label'));
-  if (world.players[1]) updateNearbyFor(world.players[1], document.getElementById('action-btn-p2'), document.getElementById('action-label-p2'));
+  // Le bouton d'action du joueur 2 n'existe que pour le vrai mode Duo local
+  // (deux joysticks sur le même écran) — en ligne, world.players[1] est le
+  // reflet de l'ami distant, pas quelqu'un qui appuie sur ce bouton-ci.
+  if (session.state.mode === 'duo' && world.players[1]) updateNearbyFor(world.players[1], document.getElementById('action-btn-p2'), document.getElementById('action-label-p2'));
   animateWater(t, world.waterGeo);
   drawMinimap();
 
@@ -112,6 +124,38 @@ document.querySelectorAll('.panel-backdrop').forEach(p => p.addEventListener('cl
 document.getElementById('mode-solo-btn').addEventListener('click', () => { setSelectedMode('solo'); goToProfilePicker(); });
 document.getElementById('mode-duo-btn').addEventListener('click', () => { setSelectedMode('duo'); goToProfilePicker(); });
 document.getElementById('back-to-mode-btn').addEventListener('click', () => { hide('profile-picker'); show('mode-picker'); });
+
+/* ----- En ligne : héberger (repris depuis l'écran profil habituel) ----- */
+document.getElementById('mode-online-btn').addEventListener('click', () => { hide('mode-picker'); show('online-choice'); });
+document.getElementById('online-choice-back-btn').addEventListener('click', () => { hide('online-choice'); show('mode-picker'); });
+document.getElementById('online-host-btn').addEventListener('click', () => {
+  setSelectedMode('online');
+  hide('online-choice');
+  goToProfilePicker();
+});
+
+/* ----- En ligne : rejoindre avec un code ----- */
+document.getElementById('online-join-btn').addEventListener('click', () => { hide('online-choice'); show('online-join'); });
+document.getElementById('online-join-back-btn').addEventListener('click', () => { hide('online-join'); show('online-choice'); });
+document.getElementById('online-join-confirm-btn').addEventListener('click', async () => {
+  const name = (document.getElementById('online-join-name').value||'').trim().slice(0,16) || 'Joueur 2';
+  const code = (document.getElementById('online-join-code').value||'').trim().toUpperCase();
+  const statusEl = document.getElementById('online-join-status');
+  if (code.length < 4) { statusEl.textContent = 'Entre le code à 4 lettres que ton ami t\'a donné.'; return; }
+  statusEl.textContent = 'Connexion en cours…';
+  document.getElementById('online-join-confirm-btn').disabled = true;
+  const slowHintTimer = setTimeout(() => {
+    statusEl.textContent = "Ça prend du temps… vérifie que vous avez bien tapé le même code, chacun de votre côté.";
+  }, 15000);
+  try {
+    const hostName = await joinOnlineGame(name, code);
+    clearTimeout(slowHintTimer);
+    document.getElementById('active-profile-label').textContent = `Profil : ${name} · Connecté·e avec ${hostName || "l'hôte"}`;
+    hide('online-join'); hide('mode-picker'); show('main-start-actions');
+  } finally {
+    document.getElementById('online-join-confirm-btn').disabled = false;
+  }
+});
 
 document.getElementById('import-save-btn').addEventListener('click', () => {
   document.getElementById('import-save-input').click();
@@ -194,6 +238,9 @@ document.getElementById('play-btn').addEventListener('click', async () => {
     document.getElementById('hud').classList.toggle('duo', session.state.mode==='duo');
     document.getElementById('start-screen').style.display='none';
     document.getElementById('hud').style.display='block';
+    if (session.state.mode === 'online' && isHost() && world.onlineCode) {
+      showToast('🔑 Ton code ami : ' + world.onlineCode);
+    }
     animate();
   } catch (err) {
     document.getElementById('loading-line').textContent = 'Oups, une erreur est survenue : ' + (err && err.message ? err.message : err);

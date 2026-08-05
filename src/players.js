@@ -146,11 +146,17 @@ const camOffset = new THREE.Vector3();
 const camTarget = new THREE.Vector3();
 export function updateCamera(dt) {
   const { camera, players, sunLight, camInput } = world;
-  const avg = new THREE.Vector3();
-  players.forEach(p => avg.add(p.mesh.position));
-  avg.divideScalar(players.length);
+  const local = players[0];
+  const remote = players[1] && players[1].remote ? players[1] : null;
+  // En ligne, l'ami peut être ailleurs sur l'île (îlot, autre zone) : dans
+  // ce cas la caméra suit juste MON personnage, comme en solo, plutôt que
+  // de partir n'importe où en essayant de cadrer les deux à la fois.
+  const remoteFramed = remote && local.mesh.position.distanceTo(remote.mesh.position) < 45;
+
+  const avg = new THREE.Vector3().copy(local.mesh.position);
   let dist = 10.5, height = 6;
-  if (players.length === 2) {
+  if (players.length === 2 && (!remote || remoteFramed)) {
+    avg.add(players[1].mesh.position).multiplyScalar(0.5);
     const sep = players[0].mesh.position.distanceTo(players[1].mesh.position);
     dist = 12 + Math.min(sep*0.55, 22);
     height = 6.5 + Math.min(sep*0.15,6);

@@ -28,4 +28,5 @@ export const world = {
   onlineRole: null,
   mySlot: 0,
   peerName: '',
+  onlineCode: '',
 };
