@@ -102,6 +102,7 @@
     <button class="icon-btn" id="btn-character">👤</button>
     <button class="icon-btn" id="btn-inventory">🎒</button>
     <button class="icon-btn" id="btn-time" title="Avancer le temps">☀️</button>
+    <button class="icon-btn" id="btn-map" title="Carte de l'île">🗺️</button>
     <button class="icon-btn" id="btn-day">⏭️</button>
     <button class="icon-btn" id="btn-switch-hud">🔀</button>
   </div>
@@ -174,6 +175,19 @@
     <h2>🚤 Le quai</h2>
     <div class="sheet-sub">Choisis un îlot secret à explorer.</div>
     <div id="islet-list"></div>
+  </div>
+</div>
+
+<!-- ================= MAP PANEL ================= -->
+<div class="panel-backdrop" id="panel-map">
+  <div class="sheet">
+    <button class="sheet-close" data-close="panel-map">✕</button>
+    <h2>🗺️ Carte de l'île</h2>
+    <div class="sheet-sub">Les 9 coins à découvrir sur Island 365.</div>
+    <div class="char-preview-wrap">
+      <canvas id="map-canvas" width="280" height="280"></canvas>
+    </div>
+    <div id="map-legend"></div>
   </div>
 </div>
 

@@ -107,6 +107,75 @@ export function drawMinimap() {
   });
 }
 
+/* ---------------------- Carte de l'île ---------------------- */
+// Les 9 grands coins de l'île, avec leur position approximative dans le
+// monde (mêmes coordonnées x/z que le jeu) pour les placer sur la carte.
+const MAP_ZONES = [
+  { n:1, emoji:'🏖️', name:'Plage de départ',   desc:"Là où l'aventure commence.",            x:0,   z:80,  color:'#f2c14e' },
+  { n:2, emoji:'🌾', name:'Prairie',            desc:'Fleurs, rochers et grands espaces.',    x:0,   z:25,  color:'#8bd15a' },
+  { n:3, emoji:'🏘️', name:'Village',            desc:'Les 4 boutiques à livrer.',              x:0,   z:-3,  color:'#e0764a' },
+  { n:4, emoji:'🌲', name:'Forêt et la mine',    desc:'Pins, rochers et une mine à explorer.', x:-70, z:-55, color:'#3f7a4a' },
+  { n:5, emoji:'🌴', name:'Jungle',              desc:'Arbres touffus et animaux cachés.',      x:35,  z:-57, color:'#1c6b3a' },
+  { n:6, emoji:'💦', name:'La cascade',          desc:"L'eau qui tombe de la montagne.",       x:-22, z:-84, color:'#3aa0c8' },
+  { n:7, emoji:'⛰️', name:'La montagne',         desc:'Le sommet le plus haut de l’île.', x:20,  z:-98, color:'#b9b6ad' },
+  { n:8, emoji:'🏝️', name:'Îlots secrets',       desc:'Accessibles en bateau depuis le quai.',  x:60,  z:55,  color:'#d66bff' },
+  { n:9, emoji:'⚓', name:'Le quai',              desc:'Pour embarquer vers les îlots.',         x:41,  z:95,  color:'#2b6fe0' },
+];
+
+let mapCtx;
+export function drawIslandMap() {
+  const cnv = document.getElementById('map-canvas');
+  if (!mapCtx) mapCtx = cnv.getContext('2d');
+  const ctx = mapCtx, S=280, C=S/2, scale = C/200;
+  ctx.clearRect(0,0,S,S);
+  ctx.fillStyle = '#1c8f92'; ctx.fillRect(0,0,S,S);
+
+  // Silhouette de l'île (même forme que le vrai terrain)
+  ctx.beginPath();
+  for (let a=0; a<=Math.PI*2+0.1; a+=0.1) {
+    const r = islandRadius(a)*scale;
+    const x = C + Math.sin(a)*r, y = C - Math.cos(a)*r;
+    if (a===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  }
+  ctx.closePath(); ctx.fillStyle = '#7fbf6a'; ctx.fill();
+  ctx.fillStyle='#caa968'; ctx.beginPath(); ctx.arc(C, C-6*scale, 18*scale,0,Math.PI*2); ctx.fill();
+
+  // Petits îlots secrets, dispersés autour de l'île principale
+  ISLETS.forEach(is => {
+    const px = C + is.pos.x*scale, py = C - is.pos.z*scale;
+    ctx.fillStyle = '#e8dcc0'; ctx.beginPath(); ctx.arc(px,py,7,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle='#173B3B'; ctx.lineWidth=1; ctx.stroke();
+    ctx.font='9px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(is.emoji, px, py+0.5);
+  });
+
+  // Les 9 zones numérotées
+  MAP_ZONES.forEach(z => {
+    const px = C + z.x*scale, py = C - z.z*scale;
+    ctx.fillStyle = z.color; ctx.beginPath(); ctx.arc(px,py,10,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.stroke();
+    ctx.fillStyle='#fff'; ctx.font='bold 10px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(z.n, px, py+0.5);
+  });
+}
+
+export function renderMapLegend() {
+  const list = document.getElementById('map-legend');
+  list.innerHTML = '';
+  MAP_ZONES.forEach(z => {
+    const row = document.createElement('div'); row.className = 'map-zone-row';
+    row.innerHTML = `<div class="map-zone-num" style="background:${z.color};">${z.n}</div>
+      <div class="map-zone-text"><b>${z.emoji} ${z.name}</b><span>${z.desc}</span></div>`;
+    list.appendChild(row);
+  });
+}
+
+export function openMapPanel() {
+  drawIslandMap();
+  renderMapLegend();
+  openPanel('panel-map');
+}
+
 /* ---------------------- Inventaire ---------------------- */
 export function refreshInventoryPanel() {
   const grid = document.getElementById('inv-grid');

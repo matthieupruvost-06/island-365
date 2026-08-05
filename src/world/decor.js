@@ -47,6 +47,16 @@ export function makeRock() {
   m.rotation.set(rand(0,Math.PI),rand(0,Math.PI),rand(0,Math.PI));
   return m;
 }
+export function makeBush() {
+  const g = new THREE.Group();
+  const leafMat = lowPolyMat(pick([0x3d7a3d, 0x4f8f5a, 0x2f6b4f]));
+  for (let i=0; i<3; i++) {
+    const s = new THREE.Mesh(new THREE.IcosahedronGeometry(rand(0.32,0.52), 0), leafMat);
+    s.position.set(rand(-0.2,0.2), rand(0.22,0.4), rand(-0.2,0.2));
+    g.add(s);
+  }
+  return g;
+}
 export function makeFlower() {
   const g = new THREE.Group();
   const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.03,0.03,0.5,4), lowPolyMat(0x3d7a3d));

@@ -200,6 +200,15 @@ canvas{display:block;touch-action:none;}
 .islet-row button{border:none;background:var(--lagoon);color:#fff;padding:8px 14px;border-radius:20px;font-weight:700;font-size:12.5px;}
 #reset-note{font-size:11px;color:#8a8578;text-align:center;margin-top:14px;}
 
+/* ---------- CARTE DE L'ÎLE ---------- */
+#map-canvas{border-radius:20px;background:#1c8f92;}
+.map-zone-row{display:flex;align-items:center;gap:10px;background:#fff;border-radius:14px;
+  padding:9px 12px;margin-top:8px;box-shadow:0 2px 8px rgba(0,0,0,.08);}
+.map-zone-num{color:#fff;font-weight:800;border-radius:50%;width:26px;height:26px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:12.5px;}
+.map-zone-text b{display:block;font-size:13.5px;color:var(--ink);}
+.map-zone-text span{font-size:11.5px;color:#5a7a7a;}
+
 /* ---------- CHARACTER CREATOR ---------- */
 .char-preview-wrap{display:flex;justify-content:center;margin-bottom:8px;clear:both;}
 #char-preview-canvas{border-radius:20px;background:linear-gradient(180deg,#bdeefc,#eafaf0);}
