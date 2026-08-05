@@ -26,11 +26,11 @@ const keys = {};
 window.addEventListener('keydown', e => { keys[e.key.toLowerCase()] = true; });
 window.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
 
-export function setupJoystick(zoneId, nubId, inputState) {
+export function setupJoystick(zoneId, nubId, inputState, radius) {
   const zone = document.getElementById(zoneId);
   const nub = document.getElementById(nubId);
   let originX=0, originY=0, touchId=null;
-  const RADIUS = zoneId.indexOf('p2') >= 0 ? 42 : 55;
+  const RADIUS = radius || (zoneId.indexOf('p2') >= 0 ? 42 : 55);
 
   function start(x,y,id) { inputState.active = true; touchId = id; originX = x; originY = y; }
   function move(x,y) {
@@ -114,7 +114,7 @@ export function updateAllPlayers(dt) {
 const camOffset = new THREE.Vector3();
 const camTarget = new THREE.Vector3();
 export function updateCamera(dt) {
-  const { camera, players, sunLight } = world;
+  const { camera, players, sunLight, camInput } = world;
   const avg = new THREE.Vector3();
   players.forEach(p => avg.add(p.mesh.position));
   avg.divideScalar(players.length);
@@ -124,7 +124,18 @@ export function updateCamera(dt) {
     dist = 12 + Math.min(sep*0.55, 22);
     height = 6.5 + Math.min(sep*0.15,6);
   }
-  camOffset.set(-Math.sin(world.camHeading)*dist, height, -Math.cos(world.camHeading)*dist);
+  // Stick caméra : pousser vers le haut = vue plus haute (façon vue de
+  // dessus), vers le bas = vue plus basse/rapprochée ; gauche/droite fait
+  // tourner la vue autour du personnage. Revient à zéro tout seul quand on
+  // relâche le stick, donc pas besoin de remettre la caméra en place à la main.
+  const lookYaw = (camInput.dx || 0) * 1.2;
+  const lookHeight = -(camInput.dy || 0) * 6;
+  const lookDist = -(camInput.dy || 0) * 2.5;
+  const heading = world.camHeading + lookYaw;
+  const effHeight = Math.max(1.5, height + lookHeight);
+  const effDist = Math.max(5, dist + lookDist);
+
+  camOffset.set(-Math.sin(heading)*effDist, effHeight, -Math.cos(heading)*effDist);
   camTarget.copy(avg).add(camOffset);
   camera.position.lerp(camTarget, Math.min(1, dt*4));
   camera.lookAt(new THREE.Vector3(avg.x, avg.y+1.3, avg.z));

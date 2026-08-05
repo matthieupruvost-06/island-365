@@ -16,4 +16,8 @@ export const world = {
   players: [],
   currentArea: 'main',
   camHeading: Math.PI,
+  // Stick caméra : regarder temporairement de plus haut/plus bas ou tourner
+  // la vue. Revient tout seul à zéro quand on relâche (même mécanique que
+  // les inputs joueurs), donc la caméra normale reprend automatiquement.
+  camInput: { active: false, dx: 0, dy: 0 },
 };

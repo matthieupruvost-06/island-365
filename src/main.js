@@ -187,6 +187,7 @@ document.getElementById('play-btn').addEventListener('click', async () => {
     initWorld();
     setupJoystick('joystick-zone','joy-nub', world.players[0].input);
     if (session.state.mode === 'duo') setupJoystick('joystick-zone-p2','joy-nub-p2', world.players[1].input);
+    setupJoystick('joystick-zone-cam','joy-nub-cam', world.camInput, 28);
     setupMinimap();
     refreshHUD();
     world.collectMeshes = scatterCollectibles(world.scene);
