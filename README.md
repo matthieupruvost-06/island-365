@@ -41,7 +41,30 @@ sert le site depuis `https://<user>.github.io/<repo>/`.
 push, sans configuration supplémentaire.
 
 Le jeu doit être servi en **HTTPS** (GitHub Pages, Vercel et Netlify le font
-par défaut) : c'est nécessaire pour un usage tactile fiable sur mobile.
+par défaut) : c'est nécessaire pour un usage tactile fiable sur mobile, et
+requis pour l'installation en PWA ci-dessous.
+
+## Installer sur iPhone (PWA)
+
+Le jeu est une vraie PWA (manifest + service worker via `vite-plugin-pwa`) :
+une fois déployé en HTTPS, il s'installe sur l'écran d'accueil comme une
+app, en plein écran, et fonctionne même hors connexion après un premier
+chargement.
+
+Sur iPhone (Safari, obligatoire — Chrome iOS ne peut pas installer de PWA) :
+
+1. Ouvre l'URL du jeu déployé dans **Safari**.
+2. Appuie sur l'icône de partage (le carré avec la flèche vers le haut).
+3. Choisis **"Sur l'écran d'accueil"**.
+4. Lance le jeu depuis son icône sur l'écran d'accueil : il s'ouvre en plein
+   écran, sans barre d'adresse.
+
+**Mises à jour automatiques.** Le service worker est configuré en
+`registerType: 'autoUpdate'` : à chaque nouveau déploiement (push sur
+`main` → build → publication), la prochaine fois que tu rouvres l'app
+depuis l'écran d'accueil, elle télécharge et applique la nouvelle version
+automatiquement, sans rien à faire de ton côté et sans jamais toucher à tes
+données de sauvegarde (voir section suivante).
 
 ## Stockage : localStorage, pas de compte, pas de réseau
 
@@ -64,14 +87,37 @@ partagent une partie en réseau. Le mode Duo reste volontairement local : deux
 personnages, deux joysticks, sur le même écran — voir "Pistes futures"
 ci-dessous pour un vrai multijoueur réseau.
 
+### Ne pas perdre sa progression
+
+`localStorage` survit aux fermetures de l'app, aux redémarrages du
+téléphone et aux mises à jour du jeu (une mise à jour ne touche jamais aux
+données de sauvegarde, seulement au code). En revanche, ce n'est pas un
+coffre-fort absolu : un nettoyage manuel des données du navigateur/de
+l'app, ou un changement de téléphone, effacerait la sauvegarde locale.
+
+Pour se prémunir de ça, l'écran d'accueil propose deux boutons :
+
+- **💾 Sauvegarder mes données** (une fois un profil sélectionné) — télécharge
+  un fichier `island365-sauvegarde-AAAA-MM-JJ.json` contenant tous les
+  profils et parties de cet appareil. À faire de temps en temps, ou avant de
+  changer de téléphone.
+- **📂 Restaurer une sauvegarde** (sur l'écran de choix du mode) — réimporte
+  un fichier exporté précédemment, sur ce même appareil ou un autre.
+  Pratique pour réinstaller la PWA sur un nouvel iPhone sans rien perdre.
+
 ## Structure du projet
 
 ```
 index.html            squelette HTML (écran d'accueil, HUD, panneaux)
+vite.config.js         base relative + configuration PWA (manifest, service worker)
+public/
+  icons/                icônes PWA (192/512/maskable)
+  apple-touch-icon.png    icône pour l'écran d'accueil iOS
 src/
   main.js              entrée : boot, wiring de l'écran d'accueil, boucle de jeu
   styles.css           tout le CSS (HUD, panneaux, écran d'accueil)
   storage.js           localStorage derrière l'interface get/set/delete/list
+  backup.js             export / import manuel de la sauvegarde (fichier JSON)
   state.js             état de sauvegarde (freshState, currentDayIndex, save/load)
   profiles.js          profils multiples + migration de l'ancienne sauvegarde
   config.js             constantes : boutiques/quartiers, missions, collectibles,
@@ -113,7 +159,10 @@ gardé son nom pour rester facile à comparer.
   caméra partagée), avec reprise automatique du dernier profil utilisé.
 - Joystick tactile + clavier (ZQSD/flèches), déplacement toujours relatif à
   l'orientation de la caméra.
-- Sauvegarde automatique (debounce ~800 ms) à chaque changement d'état.
+- Sauvegarde automatique (debounce ~800 ms) à chaque changement d'état, plus
+  export/import manuel en secours (voir "Ne pas perdre sa progression").
+- Installable en PWA sur iPhone/Android, mises à jour automatiques, jouable
+  hors connexion une fois installée.
 
 ## Pistes futures (hors-scope de cette passe)
 
@@ -123,7 +172,6 @@ gardé son nom pour rester facile à comparer.
   données partagée à la place de `localStorage`. Chantier séparé.
 - Passage de 48 à 365 boutiques réellement modélisées.
 - Rédaction de 365 missions uniques plutôt qu'un cycle de 12.
-- PWA complète (manifest, service worker, mode hors-ligne installable).
 
 ## Tester sur mobile
 
