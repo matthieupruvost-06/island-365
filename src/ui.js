@@ -233,9 +233,10 @@ export function openBoatPanel() {
     const btn = document.createElement('button'); btn.textContent = 'Naviguer';
     btn.onclick = () => {
       world.currentArea = is.key;
+      session.state.currentArea = is.key; scheduleSave();
       // En ligne, l'ami navigue de son côté sur son appareil : on ne
       // téléporte que son propre personnage, pas le "reflet" de l'ami.
-      world.players.forEach((p) => { if (p.remote) return; p.mesh.position.set(is.pos.x+rand(-5,5), 1.4, is.pos.z+rand(-5,5)); });
+      world.players.forEach((p) => { if (p.remote) return; p.mesh.position.set(is.pos.x+rand(-5,5), is.pos.y+0.9, is.pos.z+rand(-5,5)); });
       showToast('⛵ Vous accostez sur '+is.name);
       closePanel('panel-boat');
     };
@@ -246,6 +247,7 @@ export function openBoatPanel() {
   const bb = document.createElement('button'); bb.textContent='Rentrer';
   bb.onclick = () => {
     world.currentArea='main';
+    session.state.currentArea = 'main'; scheduleSave();
     world.players.forEach((p,i) => { if (p.remote) return; p.mesh.position.set(41+(i*3), 1.4, 96); });
     showToast('⛵ Retour sur Island 365');
     closePanel('panel-boat');

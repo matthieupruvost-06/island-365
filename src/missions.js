@@ -30,6 +30,10 @@ export function updateNearbyFor(p, btnEl, labelEl) {
       }
     }
   } else {
+    // Sur un îlot : toujours un moyen de rentrer (l'îlot est petit, pas
+    // besoin d'être pile au bon endroit) — sinon on pourrait rester
+    // coincé là-bas.
+    p.nearest = {type:'boat'};
     const mission = currentMission();
     if (isMissionDoneToday()) {
       reachRequestSent = false;

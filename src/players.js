@@ -5,9 +5,21 @@ import { world } from './world/runtime.js';
 import { ISLETS } from './world/islets.js';
 import { session } from './state.js';
 
+// Hauteur du sol là où marche le joueur : la formule de terrain ne connaît
+// que l'île principale, donc sur un îlot on utilise directement sa hauteur
+// de surface (les îlots sont de simples plateformes plates) au lieu de
+// laisser le joueur tomber dans l'océan sous l'îlot.
+export function groundHeightHere(x, z) {
+  if (world.currentArea !== 'main') {
+    const is = ISLETS.find(i => i.key === world.currentArea);
+    if (is) return is.pos.y + 0.9;
+  }
+  return groundHeight(x, z);
+}
+
 export function makePlayerEntity(scene, appearance, savedPos) {
   const mesh = buildCharacterMesh(appearance);
-  const gy = groundHeight(savedPos.x, savedPos.z);
+  const gy = groundHeightHere(savedPos.x, savedPos.z);
   mesh.position.set(savedPos.x, gy, savedPos.z);
   scene.add(mesh);
   return { appearance, mesh, heading:Math.PI, bob:0, input:{active:false,dx:0,dy:0}, useKeyboard:false, nearest:null };
@@ -127,7 +139,7 @@ export function updateAllPlayers(dt) {
       }
       p.bob += dt*10;
     } else { p.bob *= 0.9; }
-    const gy = groundHeight(p.mesh.position.x, p.mesh.position.z);
+    const gy = groundHeightHere(p.mesh.position.x, p.mesh.position.z);
     p.mesh.position.y = gy + Math.abs(Math.sin(p.bob))*0.08;
   });
   if (turnWeight > 0) world.camHeading += (turnAccum/turnWeight)*Math.min(1,dt*3);

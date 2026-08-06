@@ -11,7 +11,7 @@ import { buildWaterfall, buildMineEntrance, buildDock } from './world/landmarks.
 import { buildVillage } from './world/village.js';
 import { scatterCollectibles, updateCollectibles } from './world/collectibles.js';
 import { rng } from './rng.js';
-import { makePlayerEntity, updateAllPlayers, updateCamera, setupJoystick } from './players.js';
+import { makePlayerEntity, updateAllPlayers, updateCamera, setupJoystick, withinMainBounds, groundHeightHere } from './players.js';
 import { updateNearbyFor, completeReachMission } from './missions.js';
 import { initCharacterCreator, openCharacterPanel } from './character.js';
 import {
@@ -84,6 +84,11 @@ function initWorld() {
   scatter(world.scene, 9, makeRabbit, [-20,90], [-90,-24]);
   scatter(world.scene, 8, makeBird, [-20,90], [-90,-24]);
 
+  // Si le jeu a été fermé pendant qu'on était sur un îlot, on retrouve la
+  // bonne zone (et donc la bonne hauteur de sol) au lieu de réapparaître
+  // dans le vide au-dessus de l'océan.
+  world.currentArea = session.state.currentArea || 'main';
+
   world.players = [];
   if (session.state.mode === 'duo') {
     world.players.push(makePlayerEntity(world.scene, session.state.players[0].appearance, session.state.players[0].pos));
@@ -99,6 +104,19 @@ function initWorld() {
   } else {
     world.players.push(makePlayerEntity(world.scene, session.state.appearance, session.state.playerPos));
     world.players[0].useKeyboard = true;
+  }
+
+  // Filet de sécurité : si une ancienne sauvegarde a laissé quelqu'un
+  // "coincé" hors des limites de l'île principale (par exemple restée d'un
+  // séjour sur un îlot jamais mémorisé), on le replace gentiment sur la
+  // plage de départ plutôt que de le laisser bloqué dans le vide.
+  if (world.currentArea === 'main') {
+    world.players.forEach(p => {
+      if (p.remote) return;
+      if (!withinMainBounds(p.mesh.position.x, p.mesh.position.z)) {
+        p.mesh.position.set(0, groundHeightHere(0,82), 82);
+      }
+    });
   }
 
   world.clock = new THREE.Clock();

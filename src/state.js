@@ -11,7 +11,10 @@ export function freshState(mode) {
     coins: 0,
     dayOffset: 0,
     startDayIndex: realDayIndex(), // le jour 1 commence à la création du profil
-    completedDays: {}
+    completedDays: {},
+    currentArea: 'main' // 'main' ou la clé d'un îlot (voir ISLETS) : sert à
+    // retrouver le bon endroit (et la bonne hauteur du sol) si on ferme le
+    // jeu pendant qu'on est sur un îlot.
   };
   if (mode === 'duo' || mode === 'online') {
     // 'online' utilise la même forme que 'duo' (deux personnages) : l'un
