@@ -24,18 +24,30 @@ export function buildDock(scene) {
   const g = new THREE.Group();
   for (let i=0; i<7; i++) {
     const plank = new THREE.Mesh(new THREE.BoxGeometry(1.6,0.2,3.4), lowPolyMat(0x8a6a45));
-    plank.position.set(0, 0.7, i*3.6); plank.castShadow=true; plank.receiveShadow=true;
+    plank.position.set(0, 0.55, i*3.6); plank.castShadow=true; plank.receiveShadow=true;
     g.add(plank);
   }
   g.position.set(41, 0, 95); scene.add(g);
 
+  // Le bateau : amarré à côté du ponton (pas pile sur le chemin), avec une
+  // coque basse et large — comme un vrai bateau — plutôt qu'un tube debout,
+  // et des couleurs vives bien différentes du bois du quai pour qu'on le
+  // reconnaisse tout de suite.
   const boatMesh = new THREE.Group();
-  const hull = new THREE.Mesh(new THREE.CylinderGeometry(0.9,0.4,3.2,6), lowPolyMat(0xb5713f));
-  hull.rotation.z = Math.PI/2; hull.position.y=0.55; hull.castShadow=true;
+  const hull = new THREE.Mesh(new THREE.CylinderGeometry(0.55,1.05,3.6,8), lowPolyMat(0xd9503a));
+  hull.rotation.z = Math.PI/2; hull.scale.y = 0.42; hull.position.y = 0.28;
+  hull.castShadow = true; hull.receiveShadow = true;
   boatMesh.add(hull);
-  const sail = new THREE.Mesh(new THREE.ConeGeometry(0.9,1.8,4), lowPolyMat(0xfbf3e1));
-  sail.position.set(0,1.6,0); boatMesh.add(sail);
-  boatMesh.position.set(41, 0.6, 102);
+  const deck = new THREE.Mesh(new THREE.BoxGeometry(3,0.14,1.5), lowPolyMat(0xe4c896));
+  deck.position.y = 0.55; deck.castShadow = true;
+  boatMesh.add(deck);
+  const mast = new THREE.Mesh(new THREE.CylinderGeometry(0.07,0.09,1.9,6), lowPolyMat(0x6d4a2f));
+  mast.position.set(-0.2,1.55,0); boatMesh.add(mast);
+  const sail = new THREE.Mesh(new THREE.ConeGeometry(0.7,1.5,4), lowPolyMat(0xfbf3e1));
+  sail.position.set(-0.2,2.4,0); boatMesh.add(sail);
+  const flag = new THREE.Mesh(new THREE.ConeGeometry(0.13,0.28,3), lowPolyMat(0xe2543f));
+  flag.rotation.z = Math.PI/2; flag.position.set(-0.2,3.2,0.04); boatMesh.add(flag);
+  boatMesh.position.set(43.2, 0.15, 100);
   scene.add(boatMesh);
   return boatMesh;
 }
