@@ -4,8 +4,8 @@ import { world } from './world/runtime.js';
 import { buildSky, buildClouds } from './world/sky.js';
 import { buildMainTerrain } from './world/terrain.js';
 import { buildOcean, animateWater } from './world/ocean.js';
-import { scatter, makePalm, makePine, makeJungleTree, makeRock, makeFlower, makeBush, makeSeashell, makeDriftwood, makeGrassTuft } from './world/decor.js';
-import { makeRabbit, makeBird, makeDeer } from './world/animals.js';
+import { scatter, makePalm, makePine, makeJungleTree, makeRock, makeFlower, makeBush, makeSeashell, makeDriftwood, makeGrassTuft, makeParasol, makeBeachTowel } from './world/decor.js';
+import { makeRabbit, makeBird, makeDeer, makeSheep } from './world/animals.js';
 import { buildIslets } from './world/islets.js';
 import { buildWaterfall, buildMineEntrance, buildDock } from './world/landmarks.js';
 import { buildVillage } from './world/village.js';
@@ -80,12 +80,17 @@ function initWorld() {
   scatter(world.scene, 60, makeSeashell, [-104,104], [50,118]);
   scatter(world.scene, 18, makeDriftwood, [-104,104], [50,118]);
   scatter(world.scene, 70, makeGrassTuft, [-85,85], [5,46]);
+  // Petit coin cocooning sur la plage : parasols colorés et serviettes.
+  scatter(world.scene, 10, makeParasol, [-95,95], [54,100]);
+  scatter(world.scene, 14, makeBeachTowel, [-95,95], [54,100]);
 
   // Un peu de vie dans les bois : petits animaux décoratifs, dispersés
   // dans la forêt de pins (avec la mine) et dans la jungle.
   scatter(world.scene, 7, makeRabbit, [-96,-24], [-90,-24]);
   scatter(world.scene, 6, makeBird, [-96,-24], [-90,-24]);
   scatter(world.scene, 3, makeDeer, [-96,-30], [-85,-30]);
+  // Des moutons tranquilles dans la prairie, pour l'ambiance.
+  scatter(world.scene, 7, makeSheep, [-85,85], [5,46]);
   scatter(world.scene, 9, makeRabbit, [-20,90], [-90,-24]);
   scatter(world.scene, 8, makeBird, [-20,90], [-90,-24]);
 

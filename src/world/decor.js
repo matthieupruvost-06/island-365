@@ -138,6 +138,53 @@ export function makeGrassTuft() {
   return g;
 }
 
+// Parasol rayé, pour donner un petit côté "vacances" à la plage. Les rayures
+// sont de vraies couleurs de sommets (pas une texture) réparties autour du
+// cône, façon moulin à vent.
+export function makeParasol() {
+  const g = new THREE.Group();
+  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.035,0.045,1.7,6), lowPolyMat(0xe8dcc0));
+  pole.position.y = 0.85; g.add(pole);
+
+  const stripePairs = [[0xff6f6f,0xffffff],[0xffd166,0xffffff],[0x4fd1c5,0xffffff],[0xff9a5c,0xffffff],[0xd66bff,0xffffff]];
+  const [c1hex, c2hex] = pick(stripePairs);
+  const segs = 10;
+  const geo = new THREE.ConeGeometry(1.05, 0.5, segs, 1, false);
+  geo.toNonIndexed();
+  const pos = geo.attributes.position;
+  const colors = new Float32Array(pos.count*3);
+  const col1 = new THREE.Color(c1hex), col2 = new THREE.Color(c2hex);
+  for (let i=0; i<pos.count; i+=3) {
+    let sx=0, sz=0;
+    for (let k=0; k<3; k++) { sx += pos.getX(i+k); sz += pos.getZ(i+k); }
+    const a = Math.atan2(sz, sx);
+    const seg = Math.floor(((a+Math.PI)/(Math.PI*2))*segs) % segs;
+    const c = (seg%2===0) ? col1 : col2;
+    for (let k=0; k<3; k++) { colors[(i+k)*3]=c.r; colors[(i+k)*3+1]=c.g; colors[(i+k)*3+2]=c.b; }
+  }
+  geo.setAttribute('color', new THREE.BufferAttribute(colors,3));
+  const canopy = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({vertexColors:true, flatShading:true, roughness:0.8}));
+  canopy.position.y = 1.55;
+  g.add(canopy);
+  const tip = new THREE.Mesh(new THREE.SphereGeometry(0.05,6,6), lowPolyMat(c1hex));
+  tip.position.y = 1.82; g.add(tip);
+  return g;
+}
+export function makeBeachTowel() {
+  const g = new THREE.Group();
+  const stripeSets = [[0xff6f6f,0xffffff],[0x4fd1c5,0xffe9c7],[0xffd166,0xffffff],[0xd66bff,0xffffff]];
+  const [c1,c2] = pick(stripeSets);
+  const towel = new THREE.Mesh(new THREE.PlaneGeometry(0.85,1.5), lowPolyMat(pick([c1,c2])));
+  towel.rotation.x = -Math.PI/2;
+  towel.position.y = 0.015;
+  g.add(towel);
+  const stripe = new THREE.Mesh(new THREE.PlaneGeometry(0.85,0.3), lowPolyMat(pick([c1,c2])));
+  stripe.rotation.x = -Math.PI/2;
+  stripe.position.set(0, 0.02, rand(-0.4,0.4));
+  g.add(stripe);
+  return g;
+}
+
 export function scatter(scene, count, fn, xRange, zRange) {
   for (let i=0; i<count; i++) {
     const x = rand(xRange[0],xRange[1]), z = rand(zRange[0],zRange[1]);
