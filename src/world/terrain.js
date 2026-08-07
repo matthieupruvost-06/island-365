@@ -9,8 +9,33 @@ export function lerp(a, b, t) { return a + (b - a) * t; }
 // que le sol ne soit pas d'une couleur parfaitement uniforme — un rendu un
 // peu plus naturel, sans casser le style "low poly" du jeu.
 function colorNoise(x, z) {
-  const s = Math.sin(x*12.9898 + z*78.233) * 43758.5453;
-  return (s - Math.floor(s)) * 0.1 - 0.05; // entre -0.05 et +0.05
+  const s1 = Math.sin(x*12.9898 + z*78.233) * 43758.5453;
+  const n1 = (s1 - Math.floor(s1)) * 0.16 - 0.08; // grosses taches, ±0.08
+  const s2 = Math.sin(x*53.12 + z*91.7) * 21391.2;
+  const n2 = (s2 - Math.floor(s2)) * 0.06 - 0.03; // petit grain fin, ±0.03
+  return n1 + n2;
+}
+
+// Petite texture "grain" générée une seule fois (pas de fichier à
+// télécharger) et répétée sur tout le sol : ça casse l'effet "plastique
+// uniforme" du low poly, sans changer le style du jeu.
+let _groundTex = null;
+export function groundNoiseTexture() {
+  if (_groundTex) return _groundTex;
+  const c = document.createElement('canvas'); c.width = 128; c.height = 128;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,128,128);
+  for (let i=0; i<2600; i++) {
+    const x = Math.random()*128, y = Math.random()*128;
+    const v = 185 + Math.random()*70;
+    ctx.fillStyle = `rgba(${v|0},${v|0},${v|0},${(0.12+Math.random()*0.22).toFixed(2)})`;
+    ctx.fillRect(x, y, 1+Math.random(), 1+Math.random());
+  }
+  const tex = new THREE.CanvasTexture(c);
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(90, 90);
+  _groundTex = tex;
+  return tex;
 }
 
 export function terrainInfo(x, z) {
@@ -74,7 +99,7 @@ export function buildMainTerrain(scene) {
   }
   geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
   geo.computeVertexNormals();
-  const mat = new THREE.MeshStandardMaterial({vertexColors:true, flatShading:true, roughness:1});
+  const mat = new THREE.MeshStandardMaterial({vertexColors:true, flatShading:true, roughness:0.9, map: groundNoiseTexture()});
   const mesh = new THREE.Mesh(geo, mat);
   mesh.receiveShadow = true;
   scene.add(mesh);
