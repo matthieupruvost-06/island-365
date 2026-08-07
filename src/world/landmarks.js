@@ -27,7 +27,7 @@ export function buildDock(scene) {
     plank.position.set(0, 0.55, i*3.6); plank.castShadow=true; plank.receiveShadow=true;
     g.add(plank);
   }
-  g.position.set(41, 0, 95); scene.add(g);
+  g.position.set(41, 0, 110); scene.add(g);
 
   // Le bateau : amarré à côté du ponton (pas pile sur le chemin), avec une
   // coque basse et large — comme un vrai bateau — plutôt qu'un tube debout,
@@ -47,7 +47,7 @@ export function buildDock(scene) {
   sail.position.set(-0.2,2.4,0); boatMesh.add(sail);
   const flag = new THREE.Mesh(new THREE.ConeGeometry(0.13,0.28,3), lowPolyMat(0xe2543f));
   flag.rotation.z = Math.PI/2; flag.position.set(-0.2,3.2,0.04); boatMesh.add(flag);
-  boatMesh.position.set(43.2, 0.15, 100);
+  boatMesh.position.set(43.2, 0.15, 120);
   scene.add(boatMesh);
   return boatMesh;
 }

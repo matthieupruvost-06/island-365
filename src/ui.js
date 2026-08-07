@@ -87,7 +87,7 @@ export function setupMinimap() {
 }
 export function drawMinimap() {
   if (!miniCtx) return;
-  const ctx = miniCtx, S=196, C=S/2, scale = C/130;
+  const ctx = miniCtx, S=196, C=S/2, scale = C/150;
   ctx.clearRect(0,0,S,S);
   ctx.fillStyle = '#1c8f92'; ctx.fillRect(0,0,S,S);
   ctx.beginPath();
@@ -248,7 +248,7 @@ export function openBoatPanel() {
   bb.onclick = () => {
     world.currentArea='main';
     session.state.currentArea = 'main'; scheduleSave();
-    world.players.forEach((p,i) => { if (p.remote) return; p.mesh.position.set(41+(i*3), 1.4, 96); });
+    world.players.forEach((p,i) => { if (p.remote) return; p.mesh.position.set(41+(i*3), 1.4, 106); });
     showToast('⛵ Retour sur Island 365');
     closePanel('panel-boat');
   };

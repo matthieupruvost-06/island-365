@@ -2,8 +2,16 @@ import * as THREE from 'three';
 import { MOUNTAIN_PEAK, PEAK2_POS, CAVE_POS, MINE_POS } from '../config.js';
 
 export function angleOf(x, z) { return Math.atan2(x, z); }
-export function islandRadius(angle) { return 100 + 10*Math.sin(angle*3) + 5*Math.sin(angle*5+1.3); }
+export function islandRadius(angle) { return 114 + 12*Math.sin(angle*3) + 6*Math.sin(angle*5+1.3); }
 export function lerp(a, b, t) { return a + (b - a) * t; }
+
+// Petit bruit pseudo-aléatoire (mais toujours pareil pour les mêmes x,z) pour
+// que le sol ne soit pas d'une couleur parfaitement uniforme — un rendu un
+// peu plus naturel, sans casser le style "low poly" du jeu.
+function colorNoise(x, z) {
+  const s = Math.sin(x*12.9898 + z*78.233) * 43758.5453;
+  return (s - Math.floor(s)) * 0.1 - 0.05; // entre -0.05 et +0.05
+}
 
 export function terrainInfo(x, z) {
   const dist = Math.sqrt(x*x + z*z);
@@ -46,13 +54,14 @@ export function terrainInfo(x, z) {
   if (dCave < 8) { h = -0.6; c=[0.15,0.35,0.5]; }
 
   const shade = 0.92 + Math.min(1, Math.max(0,(h+1)/8))*0.08;
-  c = [c[0]*shade, c[1]*shade, c[2]*shade];
+  const n = 1 + colorNoise(x, z);
+  c = [c[0]*shade*n, c[1]*shade*n, c[2]*shade*n];
   return {h, c};
 }
 export function groundHeight(x, z) { return terrainInfo(x, z).h; }
 
 export function buildMainTerrain(scene) {
-  const size = 230, seg = 132;
+  const size = 280, seg = 160;
   const geo = new THREE.PlaneGeometry(size, size, seg, seg);
   geo.rotateX(-Math.PI/2);
   const pos = geo.attributes.position;

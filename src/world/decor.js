@@ -66,6 +66,36 @@ export function makeFlower() {
   return g;
 }
 
+export function makeSeashell() {
+  const g = new THREE.Group();
+  const mat = lowPolyMat(pick([0xffe9c7, 0xffd9b0, 0xf7c9a0, 0xffffff]));
+  const shell = new THREE.Mesh(new THREE.ConeGeometry(rand(0.12,0.2), rand(0.14,0.22), 7, 1, true), mat);
+  shell.rotation.x = Math.PI/2 + rand(-0.3,0.3); shell.rotation.z = rand(0,Math.PI*2);
+  shell.position.y = 0.06;
+  g.add(shell);
+  return g;
+}
+export function makeDriftwood() {
+  const g = new THREE.Group();
+  const mat = lowPolyMat(pick([0xb8a184, 0x9c8468, 0xcbb896]));
+  const log = new THREE.Mesh(new THREE.CylinderGeometry(0.09,0.13,rand(1.2,2.2),6), mat);
+  log.rotation.z = Math.PI/2; log.rotation.y = rand(0,Math.PI*2);
+  log.position.y = 0.12;
+  g.add(log);
+  return g;
+}
+export function makeGrassTuft() {
+  const g = new THREE.Group();
+  const mat = lowPolyMat(pick([0x5aa15a, 0x4f8f5a, 0x6bb56b]));
+  for (let i=0; i<4; i++) {
+    const blade = new THREE.Mesh(new THREE.ConeGeometry(0.035, rand(0.22,0.4), 3), mat);
+    blade.position.set(rand(-0.1,0.1), rand(0.11,0.2), rand(-0.1,0.1));
+    blade.rotation.z = rand(-0.3,0.3);
+    g.add(blade);
+  }
+  return g;
+}
+
 export function scatter(scene, count, fn, xRange, zRange) {
   for (let i=0; i<count; i++) {
     const x = rand(xRange[0],xRange[1]), z = rand(zRange[0],zRange[1]);

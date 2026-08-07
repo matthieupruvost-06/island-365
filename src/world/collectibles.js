@@ -24,13 +24,13 @@ export function spawnCollectible(scene, type, x, z, yOff) {
 export function scatterCollectibles(scene) {
   const list = [];
   const add = (type, x, z, yOff) => list.push(spawnCollectible(scene, type, x, z, yOff));
-  for (let i=0; i<22; i++) add('shell', rand(-90,90), rand(58,96));
+  for (let i=0; i<22; i++) add('shell', rand(-100,100), rand(58,110));
   for (let i=0; i<16; i++) add('flower', rand(-75,75), rand(6,46));
   for (let i=0; i<12; i++) add('flower', rand(-18,80), rand(-68,-26));
   for (let i=0; i<16; i++) add('creature', rand(-18,80), rand(-68,-26));
   for (let i=0; i<12; i++) add('gold', MINE_POS.x+rand(-7,10), MINE_POS.z+rand(-7,10));
   for (let i=0; i<12; i++) add('crystal', CAVE_POS.x+rand(-5,5), CAVE_POS.z+rand(-5,5), 1.4);
-  for (let i=0; i<12; i++) add('fish', rand(16,44), rand(88,108), 0.6);
+  for (let i=0; i<12; i++) add('fish', rand(16,44), rand(100,124), 0.6);
   ISLETS.forEach(is => { add('mappiece', is.pos.x+rand(-3,3), is.pos.z+rand(-3,3)); });
   return list;
 }

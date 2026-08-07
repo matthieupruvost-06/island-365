@@ -4,7 +4,7 @@ import { world } from './world/runtime.js';
 import { buildSky } from './world/sky.js';
 import { buildMainTerrain } from './world/terrain.js';
 import { buildOcean, animateWater } from './world/ocean.js';
-import { scatter, makePalm, makePine, makeJungleTree, makeRock, makeFlower, makeBush } from './world/decor.js';
+import { scatter, makePalm, makePine, makeJungleTree, makeRock, makeFlower, makeBush, makeSeashell, makeDriftwood, makeGrassTuft } from './world/decor.js';
 import { makeRabbit, makeBird, makeDeer } from './world/animals.js';
 import { buildIslets } from './world/islets.js';
 import { buildWaterfall, buildMineEntrance, buildDock } from './world/landmarks.js';
@@ -66,15 +66,20 @@ function initWorld() {
   world.boatMesh = buildDock(world.scene);
   world.shopMeshes = buildVillage(world.scene);
 
-  scatter(world.scene, 48, makePalm, [-90,90], [48,96]);
-  scatter(world.scene, 90, () => rng()<0.5 ? makeFlower() : makeRock(), [-75,75], [5,46]);
-  scatter(world.scene, 55, makeBush, [-75,75], [5,46]);
-  scatter(world.scene, 90, makePine, [-96,-24], [-90,-24]);
-  scatter(world.scene, 28, makeRock, [-96,-24], [-90,-24]);
-  scatter(world.scene, 34, makeBush, [-96,-24], [-90,-24]);
-  scatter(world.scene, 85, makeJungleTree, [-20,90], [-90,-24]);
-  scatter(world.scene, 22, makeRock, [-20,90], [-90,-24]);
-  scatter(world.scene, 40, makeBush, [-20,90], [-90,-24]);
+  scatter(world.scene, 64, makePalm, [-104,104], [48,116]);
+  scatter(world.scene, 100, () => rng()<0.5 ? makeFlower() : makeRock(), [-85,85], [5,46]);
+  scatter(world.scene, 65, makeBush, [-85,85], [5,46]);
+  scatter(world.scene, 110, makePine, [-110,-24], [-108,-24]);
+  scatter(world.scene, 34, makeRock, [-110,-24], [-108,-24]);
+  scatter(world.scene, 42, makeBush, [-110,-24], [-108,-24]);
+  scatter(world.scene, 100, makeJungleTree, [-20,108], [-108,-24]);
+  scatter(world.scene, 26, makeRock, [-20,108], [-108,-24]);
+  scatter(world.scene, 48, makeBush, [-20,108], [-108,-24]);
+  // Bordure de plage : coquillages et bois flotté, pour un rendu plus vivant
+  // là où la mer rencontre le sable (tout autour de la nouvelle côte).
+  scatter(world.scene, 60, makeSeashell, [-104,104], [50,118]);
+  scatter(world.scene, 18, makeDriftwood, [-104,104], [50,118]);
+  scatter(world.scene, 70, makeGrassTuft, [-85,85], [5,46]);
 
   // Un peu de vie dans les bois : petits animaux décoratifs, dispersés
   // dans la forêt de pins (avec la mine) et dans la jungle.
