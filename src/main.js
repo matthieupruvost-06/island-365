@@ -1,7 +1,7 @@
 import './styles.css';
 import * as THREE from 'three';
 import { world } from './world/runtime.js';
-import { buildSky } from './world/sky.js';
+import { buildSky, buildClouds } from './world/sky.js';
 import { buildMainTerrain } from './world/terrain.js';
 import { buildOcean, animateWater } from './world/ocean.js';
 import { scatter, makePalm, makePine, makeJungleTree, makeRock, makeFlower, makeBush, makeSeashell, makeDriftwood, makeGrassTuft } from './world/decor.js';
@@ -58,7 +58,7 @@ function initWorld() {
   world.ambientLight = new THREE.AmbientLight(0xffffff,0.22);
   world.scene.add(world.ambientLight);
 
-  buildSky(world.scene); buildMainTerrain(world.scene);
+  buildSky(world.scene); buildClouds(world.scene); buildMainTerrain(world.scene);
   const ocean = buildOcean(world.scene);
   world.waterMesh = ocean.waterMesh; world.waterGeo = ocean.waterGeo;
   buildIslets(world.scene);

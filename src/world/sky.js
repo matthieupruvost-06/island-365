@@ -1,6 +1,30 @@
 import * as THREE from 'three';
+import { rand } from '../rng.js';
 
 let skyGeo = null;
+
+// Petits nuages "low poly" (quelques boules qui se chevauchent), pour que le
+// ciel ne soit plus juste un dégradé tout plat.
+function makeCloud() {
+  const g = new THREE.Group();
+  const mat = new THREE.MeshStandardMaterial({color:0xffffff, flatShading:true, roughness:1});
+  const puffs = 4 + Math.floor(rand(0,3));
+  for (let i=0; i<puffs; i++) {
+    const s = new THREE.Mesh(new THREE.IcosahedronGeometry(rand(3,6),0), mat);
+    s.position.set(rand(-6,6), rand(-1,1.5), rand(-3,3));
+    g.add(s);
+  }
+  return g;
+}
+export function buildClouds(scene) {
+  for (let i=0; i<16; i++) {
+    const c = makeCloud();
+    const a = rand(0, Math.PI*2), r = rand(40,190);
+    c.position.set(Math.sin(a)*r, rand(55,88), Math.cos(a)*r);
+    const s = rand(0.8,1.6); c.scale.set(s,s,s);
+    scene.add(c);
+  }
+}
 
 export function buildSky(scene) {
   const geo = new THREE.SphereGeometry(420, 20, 14);

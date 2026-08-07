@@ -157,14 +157,16 @@ canvas{display:block;touch-action:none;}
 #tag-p2{left:16px;top:calc(6px + env(safe-area-inset-top) + 96px);background:var(--p2);}
 
 /* Caméra : un seul stick (visible en solo et en duo, il n'y a qu'une seule
-   caméra) placé sur le côté droit, à mi-hauteur, loin des sticks J1/J2. */
-#joystick-zone-cam{position:absolute;right:0;top:38%;width:30vw;height:30vw;max-width:130px;max-height:130px;pointer-events:auto;}
-#joy-base-cam{position:absolute;right:14px;top:38%;width:76px;height:76px;border-radius:50%;
+   caméra) placé sur le côté droit, assez bas pour ne jamais chevaucher la
+   colonne de boutons du haut (qui peut compter jusqu'à 6 boutons) ni le
+   bouton d'action en bas à droite. */
+#joystick-zone-cam{position:absolute;right:0;top:60%;width:30vw;height:30vw;max-width:130px;max-height:130px;pointer-events:auto;}
+#joy-base-cam{position:absolute;right:14px;top:60%;width:76px;height:76px;border-radius:50%;
   background:rgba(251,243,225,.35);border:3px solid rgba(23,59,59,.6);}
-#joy-nub-cam{position:absolute;right:14px;top:38%;width:76px;height:76px;border-radius:50%;
+#joy-nub-cam{position:absolute;right:14px;top:60%;width:76px;height:76px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;}
 #joy-nub-cam i{width:34px;height:34px;border-radius:50%;background:rgba(251,243,225,.92);box-shadow:0 4px 10px rgba(0,0,0,.25);}
-#tag-cam{right:16px;top:calc(38% - 26px);background:var(--ink);}
+#tag-cam{right:16px;top:calc(60% - 26px);background:var(--ink);}
 
 .show{opacity:1 !important;}
 #action-btn:active,#action-btn-p2:active{transform:translateY(3px);}
