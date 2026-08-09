@@ -80,9 +80,11 @@ function initWorld() {
   scatter(world.scene, 60, makeSeashell, [-104,104], [50,118]);
   scatter(world.scene, 18, makeDriftwood, [-104,104], [50,118]);
   scatter(world.scene, 70, makeGrassTuft, [-85,85], [5,46]);
-  // Petit coin cocooning sur la plage : parasols colorés et serviettes.
+  // Petit coin cocooning sur la plage : parasols colorés, serviettes, et
+  // quelques palmiers en plus juste à cet endroit pour un vrai coin détente.
   scatter(world.scene, 10, makeParasol, [-95,95], [54,100]);
   scatter(world.scene, 14, makeBeachTowel, [-95,95], [54,100]);
+  scatter(world.scene, 16, makePalm, [-95,95], [54,100]);
 
   // Un peu de vie dans les bois : petits animaux décoratifs, dispersés
   // dans la forêt de pins (avec la mine) et dans la jungle.

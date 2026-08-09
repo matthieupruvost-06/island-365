@@ -138,11 +138,33 @@ export function makeGrassTuft() {
   return g;
 }
 
+// Petite zone de sable à l'aspect naturel (un rond irrégulier, pas un
+// cercle parfait) posée directement sous un objet, pour qu'il ait l'air
+// vraiment installé là plutôt que juste posé au hasard sur le terrain.
+function makeSandPatch(radius) {
+  const segs = 10;
+  const geo = new THREE.CircleGeometry(radius, segs);
+  const pos = geo.attributes.position;
+  for (let i=1; i<pos.count; i++) {
+    const x = pos.getX(i), y = pos.getY(i);
+    const ang = Math.atan2(y, x);
+    const r = radius * (0.78 + rand(0,0.4));
+    pos.setXY(i, Math.cos(ang)*r, Math.sin(ang)*r);
+  }
+  geo.computeVertexNormals();
+  const mesh = new THREE.Mesh(geo, lowPolyMat(pick([0xf3e3ba, 0xecd9a8, 0xf7e8c4])));
+  mesh.rotation.x = -Math.PI/2;
+  mesh.position.y = 0.012;
+  mesh.receiveShadow = true;
+  return mesh;
+}
+
 // Parasol rayé, pour donner un petit côté "vacances" à la plage. Les rayures
 // sont de vraies couleurs de sommets (pas une texture) réparties autour du
 // cône, façon moulin à vent.
 export function makeParasol() {
   const g = new THREE.Group();
+  g.add(makeSandPatch(rand(1.3,1.7)));
   const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.035,0.045,1.7,6), lowPolyMat(0xe8dcc0));
   pole.position.y = 0.85; g.add(pole);
 

@@ -47,8 +47,8 @@ export const HAIR_STYLES  = [
   {key:'frise', label:'Frisé'}, {key:'chauve', label:'Sans cheveux'}
 ];
 
-export const DEFAULT_APPEARANCE_P1 = {skin:'#ffd9a8', hairStyle:'court', hairColor:'#4a2e1a', eyes:'#3b2a1a', shirt:'#FF7A59', pants:'#2F6B4F', hat:false, hatColor:'#2F6B4F'};
-export const DEFAULT_APPEARANCE_P2 = {skin:'#e8b088', hairStyle:'carre', hairColor:'#1b1b1b', eyes:'#2a5a8a', shirt:'#4FD1C5', pants:'#173B3B', hat:false, hatColor:'#4FD1C5'};
+export const DEFAULT_APPEARANCE_P1 = {skin:'#ffd9a8', hairStyle:'court', hairColor:'#4a2e1a', eyes:'#3b2a1a', shirt:'#FF7A59', pants:'#2F6B4F', hat:true, hatColor:'#2F6B4F'};
+export const DEFAULT_APPEARANCE_P2 = {skin:'#e8b088', hairStyle:'carre', hairColor:'#1b1b1b', eyes:'#2a5a8a', shirt:'#4FD1C5', pants:'#173B3B', hat:true, hatColor:'#4FD1C5'};
 
 // Repères fixes du monde (montagne, point de vue secondaire, grotte, mine).
 export const MOUNTAIN_PEAK = new THREE.Vector3(0, 34, -98);
