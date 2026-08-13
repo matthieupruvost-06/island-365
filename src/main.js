@@ -4,7 +4,7 @@ import { world } from './world/runtime.js';
 import { buildSky, buildClouds } from './world/sky.js';
 import { buildMainTerrain } from './world/terrain.js';
 import { buildOcean, animateWater } from './world/ocean.js';
-import { scatter, makePalm, makePine, makeJungleTree, makeRock, makeFlower, makeBush, makeSeashell, makeDriftwood, makeGrassTuft, makeParasol, makeBeachTowel } from './world/decor.js';
+import { scatter, makePalm, makePine, makeJungleTree, makeRock, makeFlower, makeBush, makeSeashell, makeDriftwood, makeGrassTuft, makeParasol, makeBeachTowel, makeLounger } from './world/decor.js';
 import { makeRabbit, makeBird, makeDeer, makeSheep } from './world/animals.js';
 import { buildIslets } from './world/islets.js';
 import { buildWaterfall, buildMineEntrance, buildDock } from './world/landmarks.js';
@@ -85,6 +85,7 @@ function initWorld() {
   scatter(world.scene, 10, makeParasol, [-95,95], [54,100]);
   scatter(world.scene, 14, makeBeachTowel, [-95,95], [54,100]);
   scatter(world.scene, 16, makePalm, [-95,95], [54,100]);
+  scatter(world.scene, 12, makeLounger, [-95,95], [54,100]);
 
   // Un peu de vie dans les bois : petits animaux décoratifs, dispersés
   // dans la forêt de pins (avec la mine) et dans la jungle.

@@ -192,6 +192,29 @@ export function makeParasol() {
   tip.position.y = 1.82; g.add(tip);
   return g;
 }
+// Transat de plage : une assise + un dossier incliné sur un cadre en bois,
+// pour pouvoir "s'imaginer" allongé au pied d'un palmier.
+export function makeLounger() {
+  const g = new THREE.Group();
+  const frameMat = barkMat(0xc9a06a, 1, 1);
+  const fabricMat = lowPolyMat(pick([0xff6f6f, 0xffd166, 0x4fd1c5, 0xff9a5c, 0xd66bff]));
+
+  const seat = new THREE.Mesh(new THREE.BoxGeometry(0.55,0.05,1.1), fabricMat);
+  seat.position.set(0, 0.32, 0.15); seat.rotation.x = -0.12; g.add(seat);
+
+  const back = new THREE.Mesh(new THREE.BoxGeometry(0.55,0.05,0.65), fabricMat);
+  back.position.set(0, 0.55, -0.45); back.rotation.x = -1.0; g.add(back);
+
+  for (const [sx,sz] of [[-0.24,0.55],[0.24,0.55],[-0.24,-0.15],[0.24,-0.15]]) {
+    const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.025,0.025,0.32,5), frameMat);
+    leg.position.set(sx, 0.16, sz); g.add(leg);
+  }
+  for (const sx of [-0.24, 0.24]) {
+    const support = new THREE.Mesh(new THREE.CylinderGeometry(0.02,0.02,0.36,5), frameMat);
+    support.position.set(sx, 0.45, -0.62); support.rotation.x = 0.5; g.add(support);
+  }
+  return g;
+}
 export function makeBeachTowel() {
   const g = new THREE.Group();
   const stripeSets = [[0xff6f6f,0xffffff],[0x4fd1c5,0xffe9c7],[0xffd166,0xffffff],[0xd66bff,0xffffff]];
